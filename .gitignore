@@ -1,0 +1,69 @@
+# =========================
+# Android Studio / Gradle
+# =========================
+
+# Gradle build output
+/build/
+*/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Local configuration
+/local.properties
+.gradle/
+.gradle-cache/
+**/out/
+**/captures/
+
+# IDE files
+.idea/
+*.iml
+
+# Log files
+*.log
+
+# Keystores
+*.jks
+*.keystore
+*.pem
+*.p12
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Android generated
+.externalNativeBuild/
+.cxx/
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+
+# Proguard / mapping
+**/proguard-rules.pro
+**/mapping.txt
+
+# Cache
+**/.cxx/
+**/.navigation/
+**/.vscode/
+**/.gradle/
+**/intermediates/
+**/generated/
+
+# Misc
+/.settings/
+*.swp
+*.swo
+
+# If using Firebase
+google-services.json
+GoogleService-Info.plist
+
+# If using Jetpack Compose previews
+.idea/deploymentTargetDropDown.xml
+
+# NDK / CMake builds
+.obj/
+.libs/
