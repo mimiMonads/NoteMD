@@ -9,6 +9,7 @@
     <string name="main_subtitle">Quick glance at your recent markdown notes</string>
     <string name="main_last_updated">Last updated %1$s</string>
     <string name="note_title_label">Title</string>
+    <string name="note_title_placeholder">Add a title...</string>
     <string name="note_content_label">Content</string>
     <string name="note_content_placeholder">Start typing your note...</string>
     <string name="note_save">Save note</string>
