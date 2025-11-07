@@ -2,9 +2,11 @@
     <string name="app_name">NoteMD</string>
     <string name="section_overview">Main</string>
     <string name="section_note">Note</string>
+    <string name="section_tokens">Tokens</string>
     <string name="section_settings">Settings</string>
     <string name="title_main_screen">Your Notes</string>
-    <string name="title_note_screen">Create Note</string>
+    <string name="title_note_screen">+</string>
+    <string name="title_tokens_screen">Recovery tokens</string>
     <string name="title_settings_screen">Settings</string>
     <string name="main_subtitle">Quick glance at your recent markdown notes</string>
     <string name="main_last_updated">Last updated %1$s</string>
@@ -19,4 +21,11 @@
     <string name="settings_sync_description">Automatically synchronize notes across devices (Place Holder!)</string>
     <string name="settings_about_title">NoteMD</string>
     <string name="settings_about_body">Stay organized with clean markdown notes. (Lorem opus)</string>
+    <string name="tokens_instructions">Practice dragging.</string>
+    <string name="tokens_tray_title">Practice words</string>
+    <string name="tokens_hint">Grab a token.</string>
+    <string name="tokens_empty_tray">All practice tokens the drop zone.</string>
+    <string name="tokens_drop_label">Drop tokens here</string>
+    <string name="tokens_drop_placeholder">Drop tokens.</string>
+    <string name="tokens_reset">Reset practice</string>
 </resources>

@@ -30,6 +30,7 @@ import com.example.notemd.ui.theme.NoteMDTheme
 enum class NoteMDSection(val labelRes: Int) {
     Main(R.string.section_overview),
     Note(R.string.section_note),
+    Tokens(R.string.section_tokens),
     Settings(R.string.section_settings)
 }
 
@@ -43,6 +44,7 @@ fun NoteMDApp(
     val topBarTitle = when (currentSection) {
         NoteMDSection.Main -> stringResource(id = R.string.title_main_screen)
         NoteMDSection.Note -> stringResource(id = R.string.title_note_screen)
+        NoteMDSection.Tokens -> stringResource(id = R.string.title_tokens_screen)
         NoteMDSection.Settings -> stringResource(id = R.string.title_settings_screen)
     }
 
@@ -80,6 +82,7 @@ fun NoteMDApp(
             when (currentSection) {
                 NoteMDSection.Main -> MainScreen()
                 NoteMDSection.Note -> NoteScreen()
+                NoteMDSection.Tokens -> TokenPracticeScreen()
                 NoteMDSection.Settings -> SettingsScreen()
             }
         }

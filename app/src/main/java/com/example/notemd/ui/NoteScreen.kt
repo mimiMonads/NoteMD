@@ -50,7 +50,7 @@ fun NoteScreen() {
         )
 
         Button(
-            onClick = { /* Save action placeholder */ },
+            onClick = { },
             modifier = Modifier.fillMaxWidth(),
             enabled = title.isNotBlank() || content.isNotBlank()
         ) {
