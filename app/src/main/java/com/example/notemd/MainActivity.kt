@@ -10,7 +10,8 @@ import com.example.notemd.ui.NoteMDApp
 import com.example.notemd.ui.theme.NoteMDTheme
 
 /**
- * Single-activity host for the Compose application.
+ * Host for the Compose application.
+ *
  */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +26,7 @@ class MainActivity : ComponentActivity() {
 }
 
 /**
- * Full-app preview so we can sanity check scaffolding changes quickly.
+ * Sanity check scaffolding changes quickly.
  */
 @Preview(showBackground = true)
 @Composable

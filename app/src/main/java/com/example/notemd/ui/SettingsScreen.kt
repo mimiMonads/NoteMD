@@ -30,7 +30,8 @@ import com.example.notemd.R
 import com.example.notemd.ui.theme.NoteMDTheme
 
 /**
- * Simple settings surface for now – enough switches to show structure without real plumbing.
+ * Simple settings surface.
+ * TODO: add some real info
  */
 @Composable
 fun SettingsScreen() {

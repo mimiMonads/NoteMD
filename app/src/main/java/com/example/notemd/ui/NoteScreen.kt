@@ -34,6 +34,9 @@ fun NoteScreen() {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        /**
+        * Tittle
+        * */
         OutlinedTextField(
             value = title,
             onValueChange = { title = it },
@@ -42,6 +45,15 @@ fun NoteScreen() {
             placeholder = { Text(text = stringResource(id = R.string.note_title_placeholder)) }
         )
 
+        /**
+         * Tags
+         * */
+
+
+
+        /**
+         * Tittle
+         * */
         OutlinedTextField(
             value = content,
             onValueChange = { content = it },

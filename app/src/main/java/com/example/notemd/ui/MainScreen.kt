@@ -28,7 +28,7 @@ import com.example.notemd.R
 import com.example.notemd.ui.theme.NoteMDTheme
 
 /**
- * Lightweight feed of placeholder notes so the rest of the UI has something to breathe around.
+ * Placeholder notes so the rest of the UI has something to breathe around.
  */
 @Composable
 fun MainScreen(
@@ -56,6 +56,7 @@ fun MainScreen(
 
 /**
  * Minimal representation of a note card shown on the overview screen.
+ * TO be used for SQL
  */
 data class NotePreview(
     val id: String,
@@ -66,6 +67,7 @@ data class NotePreview(
 )
 
 /**
+ * Preview
  * One-off card used inside the list; kept private since it only belongs here.
  */
 @Composable

@@ -35,7 +35,8 @@ enum class NoteMDSection(val labelRes: Int) {
 }
 
 /**
- * Root scaffold for the app – keeps track of the current section and wires up
+ * Navbar
+ * keeps track of the current section and wires up
  * the pieces of UI we stitch together elsewhere.
  */
 @OptIn(ExperimentalMaterial3Api::class)

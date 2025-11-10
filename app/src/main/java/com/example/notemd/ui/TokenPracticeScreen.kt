@@ -49,13 +49,15 @@ private val SeedWordSaver = listSaver<List<String>, String>(
 )
 
 /**
- * Small drag-and-drop playground for recovery tokens – great for demos and usability spikes.
+ * TODO:
+ * Small drag-and-drop playground.
  */
 @Composable
 fun TokenPracticeScreen(
     modifier: Modifier = Modifier
 ) {
-    // Keeping a stable list ensures we can always restore the original ordering after drag/drop.
+
+    // TODO: import a list and divide it
     val defaultTokens = remember {
         listOf("orbit", "ember", "solstice", "lumen", "grove", "delta", "radial", "cinder", "kepler", "breeze", "cobalt", "zenith")
     }
@@ -155,6 +157,7 @@ fun TokenPracticeScreen(
 
 /**
  * Visual drop target that reports its bounds so drag gestures know when to hand off tokens.
+ * Drop off
  */
 @Composable
 private fun TokenDropZone(
