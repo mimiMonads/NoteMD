@@ -20,6 +20,9 @@ import androidx.compose.ui.unit.dp
 import com.example.notemd.R
 import com.example.notemd.ui.theme.NoteMDTheme
 
+/**
+ * Text-first screen for drafting a note; state stays local so previews remain predictable.
+ */
 @Composable
 fun NoteScreen() {
     var title by rememberSaveable { mutableStateOf("") }
@@ -52,6 +55,7 @@ fun NoteScreen() {
         Button(
             onClick = { },
             modifier = Modifier.fillMaxWidth(),
+            // Let people tap save even with only a title or content; it's less fussy that way.
             enabled = title.isNotBlank() || content.isNotBlank()
         ) {
             Text(text = stringResource(id = R.string.note_save))

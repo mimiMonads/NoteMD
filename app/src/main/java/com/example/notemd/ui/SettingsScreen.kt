@@ -29,6 +29,9 @@ import androidx.compose.ui.unit.dp
 import com.example.notemd.R
 import com.example.notemd.ui.theme.NoteMDTheme
 
+/**
+ * Simple settings surface for now – enough switches to show structure without real plumbing.
+ */
 @Composable
 fun SettingsScreen() {
     var darkThemeEnabled by rememberSaveable { mutableStateOf(false) }
@@ -79,6 +82,9 @@ fun SettingsScreen() {
     }
 }
 
+/**
+ * Reusable row for any toggle-able setting with a title + supporting copy.
+ */
 @Composable
 private fun SettingsToggleRow(
     title: String,
@@ -86,6 +92,7 @@ private fun SettingsToggleRow(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
+    // Shared layout for switches so future additions stay consistent.
     Row(
         modifier = Modifier
             .fillMaxWidth()

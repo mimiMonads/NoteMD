@@ -27,6 +27,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.notemd.R
 import com.example.notemd.ui.theme.NoteMDTheme
 
+/**
+ * Lightweight feed of placeholder notes so the rest of the UI has something to breathe around.
+ */
 @Composable
 fun MainScreen(
     notes: List<NotePreview> = placeholderNotes()
@@ -51,6 +54,9 @@ fun MainScreen(
     }
 }
 
+/**
+ * Minimal representation of a note card shown on the overview screen.
+ */
 data class NotePreview(
     val id: String,
     val title: String,
@@ -59,6 +65,9 @@ data class NotePreview(
     val lastUpdated: String
 )
 
+/**
+ * One-off card used inside the list; kept private since it only belongs here.
+ */
 @Composable
 private fun NotePreviewCard(
     notePreview: NotePreview,
@@ -89,6 +98,7 @@ private fun NotePreviewCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 notePreview.tags.forEach { tag ->
+                    // The chips double as gentle affordances for future filtering work.
                     AssistChip(
                         onClick = { },
                         label = { Text(tag) },
@@ -109,6 +119,7 @@ private fun NotePreviewCard(
     }
 }
 
+// Hard-coded samples so the layout still feels alive before wiring real data.
 private fun placeholderNotes(): List<NotePreview> = listOf(
     NotePreview(
         id = "1",

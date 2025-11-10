@@ -48,11 +48,14 @@ private val SeedWordSaver = listSaver<List<String>, String>(
     restore = { it }
 )
 
-
+/**
+ * Small drag-and-drop playground for recovery tokens – great for demos and usability spikes.
+ */
 @Composable
 fun TokenPracticeScreen(
     modifier: Modifier = Modifier
 ) {
+    // Keeping a stable list ensures we can always restore the original ordering after drag/drop.
     val defaultTokens = remember {
         listOf("orbit", "ember", "solstice", "lumen", "grove", "delta", "radial", "cinder", "kepler", "breeze", "cobalt", "zenith")
     }
@@ -63,6 +66,7 @@ fun TokenPracticeScreen(
     var dropBounds by remember { mutableStateOf<Rect?>(null) }
     var dropActive by remember { mutableStateOf(false) }
 
+    // Helper to keep tokens sorted even after we stuff them back into the tray.
     fun List<String>.sortedByOriginalOrder(): List<String> =
         sortedBy { tokenOrder[it] ?: Int.MAX_VALUE }
 
@@ -149,6 +153,9 @@ fun TokenPracticeScreen(
     }
 }
 
+/**
+ * Visual drop target that reports its bounds so drag gestures know when to hand off tokens.
+ */
 @Composable
 private fun TokenDropZone(
     tokens: List<String>,
@@ -216,6 +223,9 @@ private fun TokenDropZone(
     }
 }
 
+/**
+ * Individual chip that tracks its own drag offset so the gesture feels immediate.
+ */
 @Composable
 private fun DraggableRecoveryToken(
     token: String,
@@ -238,6 +248,7 @@ private fun DraggableRecoveryToken(
             .pointerInput(dropBounds) {
                 detectDragGestures(
                     onDragStart = {
+                        // Drop zone highlight should only show when we're actually hovering.
                         onDragOverDropZone(false)
                     },
                     onDragEnd = {

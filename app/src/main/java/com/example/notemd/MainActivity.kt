@@ -9,17 +9,24 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.notemd.ui.NoteMDApp
 import com.example.notemd.ui.theme.NoteMDTheme
 
+/**
+ * Single-activity host for the Compose application.
+ */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             NoteMDTheme {
+                // Keep the real app entry the same as the previews for consistency.
                 NoteMDApp()
             }
         }
     }
 }
 
+/**
+ * Full-app preview so we can sanity check scaffolding changes quickly.
+ */
 @Preview(showBackground = true)
 @Composable
 fun PreviewMainInterface() {

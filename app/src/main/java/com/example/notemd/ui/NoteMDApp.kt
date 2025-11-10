@@ -34,6 +34,10 @@ enum class NoteMDSection(val labelRes: Int) {
     Settings(R.string.section_settings)
 }
 
+/**
+ * Root scaffold for the app – keeps track of the current section and wires up
+ * the pieces of UI we stitch together elsewhere.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteMDApp(
@@ -60,6 +64,7 @@ fun NoteMDApp(
         },
         floatingActionButton = {
             if (currentSection != NoteMDSection.Note) {
+                // Keep the FAB around as a gentle nudge towards note taking.
                 ExtendedFloatingActionButton(
                     onClick = { currentSection = NoteMDSection.Note },
                 ) {
@@ -89,11 +94,15 @@ fun NoteMDApp(
     }
 }
 
+/**
+ * Shared bottom navigation that mirrors the enum values we expose to the scaffold.
+ */
 @Composable
 private fun NoteMDBottomBar(
     currentSection: NoteMDSection,
     onSectionSelected: (NoteMDSection) -> Unit
 ) {
+    // The note screen is accessible via FAB, so we skip it in the bottom bar.
     NavigationBar {
         NoteMDSection.values()
             .filter { it != NoteMDSection.Note }
@@ -113,11 +122,15 @@ private fun NoteMDBottomBar(
     }
 }
 
+/**
+ * Minimal badge that uses the first letter of the section instead of icons.
+ */
 @Composable
 private fun SectionIconBadge(
     label: String,
     isSelected: Boolean
 ) {
+    // Using the first character keeps the navigation bar tidy on small screens.
     Surface(
         shape = CircleShape,
         color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
