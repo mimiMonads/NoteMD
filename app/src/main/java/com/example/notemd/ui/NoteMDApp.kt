@@ -21,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,6 +46,7 @@ fun NoteMDApp(
     modifier: Modifier = Modifier
 ) {
     var currentSection by rememberSaveable { mutableStateOf(NoteMDSection.Main) }
+    val context = LocalContext.current
 
     val topBarTitle = when (currentSection) {
         NoteMDSection.Main -> stringResource(id = R.string.title_main_screen)
@@ -86,7 +88,11 @@ fun NoteMDApp(
                 .padding(innerPadding)
         ) {
             when (currentSection) {
-                NoteMDSection.Main -> MainScreen()
+                NoteMDSection.Main -> MainScreen(
+                    onNoteSelected = { note ->
+                        context.startActivity(NoteDetailActivity.createIntent(context, note))
+                    }
+                )
                 NoteMDSection.Note -> NoteScreen()
                 NoteMDSection.Tokens -> TokenPracticeScreen()
                 NoteMDSection.Settings -> SettingsScreen()

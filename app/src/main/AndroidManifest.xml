@@ -12,6 +12,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NoteMD">
         <activity
+            android:name=".ui.NoteDetailActivity"
+            android:exported="false"
+            android:label="@string/note_detail_title_fallback"
+            android:theme="@style/Theme.NoteMD" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"

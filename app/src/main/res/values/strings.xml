@@ -8,7 +8,7 @@
     <string name="title_note_screen">+</string>
     <string name="title_tokens_screen">Recovery tokens</string>
     <string name="title_settings_screen">Settings</string>
-    <string name="main_subtitle">Quick glance at your recent markdown notes</string>
+    <string name="main_subtitle">Here are your latest markdown notes</string>
     <string name="main_last_updated">Last updated %1$s</string>
     <string name="note_title_label">Title</string>
     <string name="note_title_placeholder">Add a title...</string>
@@ -20,12 +20,14 @@
     <string name="settings_sync">Cloud sync</string>
     <string name="settings_sync_description">Automatically synchronize notes across devices (Place Holder!)</string>
     <string name="settings_about_title">NoteMD</string>
-    <string name="settings_about_body">Stay organized with clean markdown notes. (Lorem opus)</string>
-    <string name="tokens_instructions">Practice dragging.</string>
-    <string name="tokens_tray_title">Practice words</string>
-    <string name="tokens_hint">Grab a token.</string>
-    <string name="tokens_empty_tray">All practice tokens the drop zone.</string>
+    <string name="settings_about_body">NoteMD keeps your markdown notes tidy without any fuss.</string>
+    <string name="tokens_instructions">Drag the words around to practice ordering a recovery phrase.</string>
+    <string name="tokens_tray_title">Word tray</string>
+    <string name="tokens_hint">Tap or drag any token to get started.</string>
+    <string name="tokens_empty_tray">Nice work—everything is in the drop zone.</string>
     <string name="tokens_drop_label">Drop tokens here</string>
-    <string name="tokens_drop_placeholder">Drop tokens.</string>
-    <string name="tokens_reset">Reset practice</string>
+    <string name="tokens_drop_placeholder">Drop tokens here whenever you&rsquo;re ready.</string>
+    <string name="tokens_reset">Start over</string>
+    <string name="note_detail_title_fallback">Note details</string>
+    <string name="note_detail_navigate_home">Go back</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.example.notemd.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -32,7 +33,8 @@ import com.example.notemd.ui.theme.NoteMDTheme
  */
 @Composable
 fun MainScreen(
-    notes: List<NotePreview> = placeholderNotes()
+    notes: List<NotePreview> = placeholderNotes(),
+    onNoteSelected: (NotePreview) -> Unit = {}
 ) {
     LazyColumn(
         modifier = Modifier
@@ -49,7 +51,10 @@ fun MainScreen(
             )
         }
         items(notes) { note ->
-            NotePreviewCard(notePreview = note)
+            NotePreviewCard(
+                notePreview = note,
+                onClick = { onNoteSelected(note) }
+            )
         }
     }
 }
@@ -62,6 +67,7 @@ data class NotePreview(
     val id: String,
     val title: String,
     val summary: String,
+    val body: String,
     val tags: List<String>,
     val lastUpdated: String
 )
@@ -73,10 +79,13 @@ data class NotePreview(
 @Composable
 private fun NotePreviewCard(
     notePreview: NotePreview,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
 ) {
     ElevatedCard(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         colors = CardDefaults.elevatedCardColors()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -127,6 +136,16 @@ private fun placeholderNotes(): List<NotePreview> = listOf(
         id = "1",
         title = "Weekly planning doc",
         summary = "Capture weekly priorities, tasks, and quick victories to share during stand-up.",
+        body = """
+            # Weekly planning doc
+            
+            Capture weekly priorities, tasks, and quick victories to share during stand-up. Break work into small milestones and keep wins at the top for visibility.
+            
+            ## Priorities
+            - Refine editor toolbar
+            - Publish new onboarding guide
+            - Prep demo assets
+        """.trimIndent(),
         tags = listOf("planning", "work"),
         lastUpdated = "2h ago"
     ),
@@ -134,6 +153,13 @@ private fun placeholderNotes(): List<NotePreview> = listOf(
         id = "2",
         title = "Product ideas - autumn release",
         summary = "Brainstormed ideas pulled from customer feedback sessions and roadmap workshops.",
+        body = """
+            A brainstorm capturing customer requests and north-star ideas for the autumn release. Focus on collaborative features and mobile polish.
+            
+            * Shared notebooks with permissions
+            * Better offline sync
+            * Quick capture widgets
+        """.trimIndent(),
         tags = listOf("ideas", "product"),
         lastUpdated = "yesterday"
     ),
@@ -141,6 +167,13 @@ private fun placeholderNotes(): List<NotePreview> = listOf(
         id = "3",
         title = "Book highlights: Deep Work",
         summary = "Collected quotes and reflections focused on building intentional focus time habits.",
+        body = """
+            Highlights from Deep Work by Cal Newport with personal reflections on focus, attention, and routine.
+            
+            > Clarity about what matters provides clarity about what does not.
+            
+            Remember to schedule focus blocks and defend them aggressively.
+        """.trimIndent(),
         tags = listOf("reading", "personal"),
         lastUpdated = "Jun 12"
     )
