@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -66,7 +67,9 @@ fun TokenPracticeScreen(
     var trayTokens by rememberSaveable(stateSaver = SeedWordSaver) { mutableStateOf(defaultTokens) }
     var droppedTokens by rememberSaveable(stateSaver = SeedWordSaver) { mutableStateOf(emptyList<String>()) }
     var dropBounds by remember { mutableStateOf<Rect?>(null) }
+    var trayBounds by remember { mutableStateOf<Rect?>(null) }
     var dropActive by remember { mutableStateOf(false) }
+    var trayActive by remember { mutableStateOf(false) }
 
     // Helper to keep tokens sorted even after we stuff them back into the tray.
     fun List<String>.sortedByOriginalOrder(): List<String> =
@@ -84,9 +87,12 @@ fun TokenPracticeScreen(
         )
 
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onGloballyPositioned { coords -> trayBounds = coords.boundsInRoot() },
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-            shape = RoundedCornerShape(20.dp)
+            shape = RoundedCornerShape(20.dp),
+            border = if (trayActive) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
@@ -135,11 +141,13 @@ fun TokenPracticeScreen(
         TokenDropZone(
             tokens = droppedTokens,
             isActive = dropActive,
+            trayBounds = trayBounds,
             onBoundsReady = { dropBounds = it },
             onTokenRemoved = { token ->
                 droppedTokens = droppedTokens.filterNot { it == token }
                 trayTokens = (trayTokens + token).sortedByOriginalOrder()
-            }
+            },
+            onTrayHoverChange = { trayActive = it }
         )
 
         if (droppedTokens.isNotEmpty() || trayTokens.size != defaultTokens.size) {
@@ -159,12 +167,15 @@ fun TokenPracticeScreen(
  * Visual drop target that reports its bounds so drag gestures know when to hand off tokens.
  * Drop off
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun TokenDropZone(
     tokens: List<String>,
     isActive: Boolean,
+    trayBounds: Rect?,
     onBoundsReady: (Rect) -> Unit,
-    onTokenRemoved: (String) -> Unit
+    onTokenRemoved: (String) -> Unit,
+    onTrayHoverChange: (Boolean) -> Unit
 ) {
     Surface(
         modifier = Modifier
@@ -211,13 +222,17 @@ private fun TokenDropZone(
                     }
                 }
             } else {
-                Row(
+                FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     tokens.forEach { token ->
-                        AssistChip(
-                            onClick = { onTokenRemoved(token) },
-                            label = { Text(text = token) }
+                        DraggableDroppedToken(
+                            token = token,
+                            trayBounds = trayBounds,
+                            onDropped = { onTokenRemoved(token) },
+                            onDragOverTray = onTrayHoverChange,
+                            onClick = { onTokenRemoved(token) }
                         )
                     }
                 }
@@ -236,71 +251,113 @@ private fun DraggableRecoveryToken(
     onDropped: (String) -> Unit,
     onDragOverDropZone: (Boolean) -> Unit
 ) {
+    DraggableTokenChip(
+        modifier = Modifier.padding(end = 4.dp),
+        targetBounds = dropBounds,
+        onDropped = { onDropped(token) },
+        onDragOverTarget = onDragOverDropZone
+    ) { dragModifier ->
+        Surface(
+            modifier = dragModifier,
+            tonalElevation = 1.dp,
+            shape = RoundedCornerShape(50),
+            color = MaterialTheme.colorScheme.surface
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Spacer(
+                    modifier = Modifier
+                        .size(6.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = RoundedCornerShape(50)
+                        )
+                )
+                Text(
+                    text = token,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DraggableDroppedToken(
+    token: String,
+    trayBounds: Rect?,
+    onDropped: () -> Unit,
+    onDragOverTray: (Boolean) -> Unit,
+    onClick: () -> Unit
+) {
+    DraggableTokenChip(
+        targetBounds = trayBounds,
+        onDropped = onDropped,
+        onDragOverTarget = onDragOverTray
+    ) { dragModifier ->
+        AssistChip(
+            modifier = dragModifier,
+            onClick = onClick,
+            label = { Text(text = token) }
+        )
+    }
+}
+
+/**
+ * Shared chip wrapper that handles drag gestures and translation for both trays.
+ */
+@Composable
+private fun DraggableTokenChip(
+    modifier: Modifier = Modifier,
+    targetBounds: Rect?,
+    onDropped: () -> Unit,
+    onDragOverTarget: (Boolean) -> Unit = {},
+    content: @Composable (Modifier) -> Unit
+) {
     var chipCoords by remember { mutableStateOf<LayoutCoordinates?>(null) }
     var dragOffset by remember { mutableStateOf(Offset.Zero) }
 
-    Surface(
-        modifier = Modifier
-            .padding(end = 4.dp)
-            .zIndex(if (dragOffset == Offset.Zero) 0f else 1f)
-            .onGloballyPositioned { chipCoords = it }
-            .graphicsLayer {
-                translationX = dragOffset.x
-                translationY = dragOffset.y
-            }
-            .pointerInput(dropBounds) {
-                detectDragGestures(
-                    onDragStart = {
-                        // Drop zone highlight should only show when we're actually hovering.
-                        onDragOverDropZone(false)
-                    },
-                    onDragEnd = {
-                        val finalCenter = chipCoords?.boundsInRoot()?.center?.plus(dragOffset)
-                        val hitDropZone = finalCenter?.let { center ->
-                            dropBounds?.contains(center)
-                        } == true
+    val dragModifier = modifier
+        .zIndex(if (dragOffset == Offset.Zero) 0f else 1f)
+        .onGloballyPositioned { chipCoords = it }
+        .graphicsLayer {
+            translationX = dragOffset.x
+            translationY = dragOffset.y
+        }
+        .pointerInput(targetBounds) {
+            detectDragGestures(
+                onDragStart = {
+                    onDragOverTarget(false)
+                },
+                onDragEnd = {
+                    val finalCenter = chipCoords?.boundsInRoot()?.center?.plus(dragOffset)
+                    val hitTarget = finalCenter?.let { center ->
+                        targetBounds?.contains(center)
+                    } == true
 
-                        if (hitDropZone) {
-                            onDropped(token)
-                        }
-                        dragOffset = Offset.Zero
-                        onDragOverDropZone(false)
-                    },
-                    onDragCancel = {
-                        dragOffset = Offset.Zero
-                        onDragOverDropZone(false)
-                    },
-                    onDrag = { change, dragAmount ->
-                        change.consume()
-                        dragOffset += dragAmount
-                        val currentCenter = chipCoords?.boundsInRoot()?.center?.plus(dragOffset)
-                        val overDropZone = currentCenter?.let { dropBounds?.contains(it) } == true
-                        onDragOverDropZone(overDropZone)
+                    if (hitTarget) {
+                        onDropped()
                     }
-                )
-            },
-        tonalElevation = 1.dp,
-        shape = RoundedCornerShape(50),
-        color = MaterialTheme.colorScheme.surface
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Spacer(
-                modifier = Modifier
-                    .size(6.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = RoundedCornerShape(50)
-                    )
-            )
-            Text(
-                text = token,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium
+                    dragOffset = Offset.Zero
+                    onDragOverTarget(false)
+                },
+                onDragCancel = {
+                    dragOffset = Offset.Zero
+                    onDragOverTarget(false)
+                },
+                onDrag = { change, dragAmount ->
+                    change.consume()
+                    dragOffset += dragAmount
+                    val currentCenter = chipCoords?.boundsInRoot()?.center?.plus(dragOffset)
+                    val overTarget = currentCenter?.let { targetBounds?.contains(it) } == true
+                    onDragOverTarget(overTarget)
+                }
             )
         }
-    }
+
+    content(dragModifier)
 }
