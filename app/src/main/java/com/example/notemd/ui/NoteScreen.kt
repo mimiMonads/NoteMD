@@ -6,17 +6,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.notemd.R
 import com.example.notemd.ui.theme.NoteMDTheme
 
@@ -24,10 +24,34 @@ import com.example.notemd.ui.theme.NoteMDTheme
  * Text-first screen for drafting a note; state stays local so previews remain predictable.
  */
 @Composable
-fun NoteScreen() {
-    var title by rememberSaveable { mutableStateOf("") }
-    var content by rememberSaveable { mutableStateOf("") }
+fun NoteScreen(
+    noteId: Long?,
+    onSaved: () -> Unit = {},
+    onDeleted: () -> Unit = {}
+) {
+    val editorViewModel: NoteEditorViewModel = viewModel(
+        key = "noteEditor-${noteId ?: "new"}",
+        factory = NoteEditorViewModel.Factory(noteId)
+    )
+    val uiState by editorViewModel.uiState.collectAsStateWithLifecycle()
 
+    NoteEditorContent(
+        uiState = uiState,
+        onTitleChange = editorViewModel::onTitleChange,
+        onContentChange = editorViewModel::onContentChange,
+        onSave = { editorViewModel.save(onSaved) },
+        onDelete = { editorViewModel.delete(onDeleted) }
+    )
+}
+
+@Composable
+private fun NoteEditorContent(
+    uiState: NoteEditorUiState,
+    onTitleChange: (String) -> Unit,
+    onContentChange: (String) -> Unit,
+    onSave: () -> Unit,
+    onDelete: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -38,25 +62,16 @@ fun NoteScreen() {
         * Tittle
         * */
         OutlinedTextField(
-            value = title,
-            onValueChange = { title = it },
+            value = uiState.title,
+            onValueChange = onTitleChange,
             modifier = Modifier.fillMaxWidth(),
             label = { Text(text = stringResource(id = R.string.note_title_label)) },
             placeholder = { Text(text = stringResource(id = R.string.note_title_placeholder)) }
         )
 
-        /**
-         * Tags
-         * */
-
-
-
-        /**
-         * Tittle
-         * */
         OutlinedTextField(
-            value = content,
-            onValueChange = { content = it },
+            value = uiState.content,
+            onValueChange = onContentChange,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
@@ -65,12 +80,25 @@ fun NoteScreen() {
         )
 
         Button(
-            onClick = { },
+            onClick = onSave,
             modifier = Modifier.fillMaxWidth(),
-            // Let people tap save even with only a title or content; it's less fussy that way.
-            enabled = title.isNotBlank() || content.isNotBlank()
+            enabled = uiState.canSave && !uiState.isSaving
         ) {
-            Text(text = stringResource(id = R.string.note_save))
+            Text(
+                text = stringResource(
+                    id = if (uiState.isEditing) R.string.note_update else R.string.note_save
+                )
+            )
+        }
+
+        if (uiState.isEditing) {
+            OutlinedButton(
+                onClick = onDelete,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !uiState.isDeleting
+            ) {
+                Text(text = stringResource(id = R.string.note_delete))
+            }
         }
     }
 }
@@ -79,6 +107,16 @@ fun NoteScreen() {
 @Composable
 private fun PreviewNoteScreen() {
     NoteMDTheme {
-        NoteScreen()
+        NoteEditorContent(
+            uiState = NoteEditorUiState(
+                noteId = 1L,
+                title = "Weekly planning doc",
+                content = "Capture weekly priorities, tasks..."
+            ),
+            onTitleChange = {},
+            onContentChange = {},
+            onSave = {},
+            onDelete = {}
+        )
     }
 }

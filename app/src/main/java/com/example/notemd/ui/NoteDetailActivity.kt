@@ -68,7 +68,7 @@ class NoteDetailActivity : ComponentActivity() {
 
         private fun NoteDetailArgs.Companion.fromIntent(intent: Intent?): NoteDetailArgs =
             NoteDetailArgs(
-                id = intent?.getStringExtra(EXTRA_NOTE_ID).orEmpty(),
+                id = intent?.getLongExtra(EXTRA_NOTE_ID, 0L) ?: 0L,
                 title = intent?.getStringExtra(EXTRA_NOTE_TITLE).orEmpty(),
                 summary = intent?.getStringExtra(EXTRA_NOTE_SUMMARY).orEmpty(),
                 body = intent?.getStringExtra(EXTRA_NOTE_BODY).orEmpty(),
@@ -150,7 +150,7 @@ fun NoteDetailScreen(
 }
 
 data class NoteDetailArgs(
-    val id: String = "",
+    val id: Long = 0L,
     val title: String = "",
     val summary: String = "",
     val body: String = "",

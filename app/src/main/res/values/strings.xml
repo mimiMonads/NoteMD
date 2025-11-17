@@ -15,6 +15,9 @@
     <string name="note_content_label">Content</string>
     <string name="note_content_placeholder">Start typing your note...</string>
     <string name="note_save">Save note</string>
+    <string name="note_update">Update note</string>
+    <string name="note_delete">Delete note</string>
+    <string name="note_empty_state">You haven&#39;t saved any notes yet. Start with a title or some content.</string>
     <string name="settings_dark_mode">Dark mode</string>
     <string name="settings_dark_mode_description">Switch between light and dark themes</string>
     <string name="settings_sync">Cloud sync</string>

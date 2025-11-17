@@ -18,13 +18,15 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.notemd.R
 import com.example.notemd.ui.theme.NoteMDTheme
 
@@ -43,10 +45,22 @@ enum class NoteMDSection(val labelRes: Int) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteMDApp(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    previewUiState: NoteListUiState? = null
 ) {
     var currentSection by rememberSaveable { mutableStateOf(NoteMDSection.Main) }
-    val context = LocalContext.current
+    var noteToEditId by rememberSaveable { mutableStateOf<Long?>(null) }
+
+    val notesViewModel: NotesViewModel? = if (previewUiState == null) {
+        viewModel(factory = NotesViewModel.Factory)
+    } else {
+        null
+    }
+    val noteListUiState by if (previewUiState == null) {
+        notesViewModel!!.uiState.collectAsStateWithLifecycle()
+    } else {
+        remember(previewUiState) { mutableStateOf(previewUiState) }
+    }
 
     val topBarTitle = when (currentSection) {
         NoteMDSection.Main -> stringResource(id = R.string.title_main_screen)
@@ -69,7 +83,10 @@ fun NoteMDApp(
             if (currentSection != NoteMDSection.Note) {
                 // Keep the FAB around as a gentle nudge towards note taking.
                 ExtendedFloatingActionButton(
-                    onClick = { currentSection = NoteMDSection.Note },
+                    onClick = {
+                        noteToEditId = null
+                        currentSection = NoteMDSection.Note
+                    },
                 ) {
                     Text(text = stringResource(id = R.string.title_note_screen))
                 }
@@ -89,11 +106,23 @@ fun NoteMDApp(
         ) {
             when (currentSection) {
                 NoteMDSection.Main -> MainScreen(
+                    notes = noteListUiState.notes,
                     onNoteSelected = { note ->
-                        context.startActivity(NoteDetailActivity.createIntent(context, note))
+                        noteToEditId = note.id
+                        currentSection = NoteMDSection.Note
                     }
                 )
-                NoteMDSection.Note -> NoteScreen()
+                NoteMDSection.Note -> NoteScreen(
+                    noteId = noteToEditId,
+                    onSaved = {
+                        noteToEditId = null
+                        currentSection = NoteMDSection.Main
+                    },
+                    onDeleted = {
+                        noteToEditId = null
+                        currentSection = NoteMDSection.Main
+                    }
+                )
                 NoteMDSection.Tokens -> TokenPracticeScreen()
                 NoteMDSection.Settings -> SettingsScreen()
             }
@@ -156,6 +185,10 @@ private fun SectionIconBadge(
 @Composable
 private fun NoteMDAppPreview() {
     NoteMDTheme {
-        NoteMDApp()
+        NoteMDApp(
+            previewUiState = NoteListUiState(
+                notes = placeholderNotes()
+            )
+        )
     }
 }

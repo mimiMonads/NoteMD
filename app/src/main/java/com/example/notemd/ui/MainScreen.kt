@@ -50,11 +50,21 @@ fun MainScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-        items(notes) { note ->
-            NotePreviewCard(
-                notePreview = note,
-                onClick = { onNoteSelected(note) }
-            )
+        if (notes.isEmpty()) {
+            item {
+                Text(
+                    text = stringResource(id = R.string.note_empty_state),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        } else {
+            items(notes) { note ->
+                NotePreviewCard(
+                    notePreview = note,
+                    onClick = { onNoteSelected(note) }
+                )
+            }
         }
     }
 }
@@ -64,7 +74,7 @@ fun MainScreen(
  * TO be used for SQL
  */
 data class NotePreview(
-    val id: String,
+    val id: Long,
     val title: String,
     val summary: String,
     val body: String,
@@ -131,9 +141,9 @@ private fun NotePreviewCard(
 }
 
 // Hard-coded samples so the layout still feels alive before wiring real data.
-private fun placeholderNotes(): List<NotePreview> = listOf(
+internal fun placeholderNotes(): List<NotePreview> = listOf(
     NotePreview(
-        id = "1",
+        id = 1L,
         title = "Weekly planning doc",
         summary = "Capture weekly priorities, tasks, and quick victories to share during stand-up.",
         body = """
@@ -150,7 +160,7 @@ private fun placeholderNotes(): List<NotePreview> = listOf(
         lastUpdated = "2h ago"
     ),
     NotePreview(
-        id = "2",
+        id = 2L,
         title = "Product ideas - autumn release",
         summary = "Brainstormed ideas pulled from customer feedback sessions and roadmap workshops.",
         body = """
@@ -164,7 +174,7 @@ private fun placeholderNotes(): List<NotePreview> = listOf(
         lastUpdated = "yesterday"
     ),
     NotePreview(
-        id = "3",
+        id = 3L,
         title = "Book highlights: Deep Work",
         summary = "Collected quotes and reflections focused on building intentional focus time habits.",
         body = """
