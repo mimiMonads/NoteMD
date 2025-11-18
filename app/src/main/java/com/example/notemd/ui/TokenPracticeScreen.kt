@@ -53,6 +53,7 @@ private val SeedWordSaver = listSaver<List<String>, String>(
  * TODO:
  * Small drag-and-drop playground.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TokenPracticeScreen(
     modifier: Modifier = Modifier
@@ -103,9 +104,10 @@ fun TokenPracticeScreen(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
-                Row(
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     if (trayTokens.isEmpty()) {
                         Text(
@@ -129,12 +131,6 @@ fun TokenPracticeScreen(
                         }
                     }
                 }
-                Divider()
-                Text(
-                    text = stringResource(id = R.string.tokens_hint),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
             }
         }
 
@@ -252,7 +248,6 @@ private fun DraggableRecoveryToken(
     onDragOverDropZone: (Boolean) -> Unit
 ) {
     DraggableTokenChip(
-        modifier = Modifier.padding(end = 4.dp),
         targetBounds = dropBounds,
         onDropped = { onDropped(token) },
         onDragOverTarget = onDragOverDropZone
