@@ -39,6 +39,7 @@ fun NoteScreen(
         uiState = uiState,
         onTitleChange = editorViewModel::onTitleChange,
         onContentChange = editorViewModel::onContentChange,
+        onTagsChange = editorViewModel::onTagsChange,
         onSave = { editorViewModel.save(onSaved) },
         onDelete = { editorViewModel.delete(onDeleted) }
     )
@@ -49,6 +50,7 @@ private fun NoteEditorContent(
     uiState: NoteEditorUiState,
     onTitleChange: (String) -> Unit,
     onContentChange: (String) -> Unit,
+    onTagsChange: (String) -> Unit,
     onSave: () -> Unit,
     onDelete: () -> Unit
 ) {
@@ -67,6 +69,14 @@ private fun NoteEditorContent(
             modifier = Modifier.fillMaxWidth(),
             label = { Text(text = stringResource(id = R.string.note_title_label)) },
             placeholder = { Text(text = stringResource(id = R.string.note_title_placeholder)) }
+        )
+
+        OutlinedTextField(
+            value = uiState.tagsInput,
+            onValueChange = onTagsChange,
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text(text = stringResource(id = R.string.note_tags_label)) },
+            placeholder = { Text(text = stringResource(id = R.string.note_tags_placeholder)) }
         )
 
         OutlinedTextField(
@@ -111,10 +121,12 @@ private fun PreviewNoteScreen() {
             uiState = NoteEditorUiState(
                 noteId = 1L,
                 title = "Weekly planning doc",
-                content = "Capture weekly priorities, tasks..."
+                content = "Capture weekly priorities, tasks...",
+                tagsInput = "planning, work"
             ),
             onTitleChange = {},
             onContentChange = {},
+            onTagsChange = {},
             onSave = {},
             onDelete = {}
         )

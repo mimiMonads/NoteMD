@@ -14,6 +14,8 @@
     <string name="note_title_placeholder">Add a title..</string>
     <string name="note_content_label">Content</string>
     <string name="note_content_placeholder">Start typing your note..</string>
+    <string name="note_tags_label">Tags</string>
+    <string name="note_tags_placeholder">Add tags, separated by commas</string>
     <string name="note_save">Save note</string>
     <string name="note_update">Update note</string>
     <string name="note_delete">Delete note</string>

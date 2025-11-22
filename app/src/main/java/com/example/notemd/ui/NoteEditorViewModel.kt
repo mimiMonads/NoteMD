@@ -18,6 +18,7 @@ data class NoteEditorUiState(
     val noteId: Long? = null,
     val title: String = "",
     val content: String = "",
+    val tagsInput: String = "",
     val isSaving: Boolean = false,
     val isDeleting: Boolean = false
 ) {
@@ -43,7 +44,8 @@ class NoteEditorViewModel(
                         it.copy(
                             noteId = note.id,
                             title = note.title,
-                            content = note.content
+                            content = note.content,
+                            tagsInput = note.tags.joinToString(", ")
                         )
                     }
                 }
@@ -59,6 +61,10 @@ class NoteEditorViewModel(
         _uiState.update { it.copy(content = value) }
     }
 
+    fun onTagsChange(value: String) {
+        _uiState.update { it.copy(tagsInput = value) }
+    }
+
     fun save(onSaved: () -> Unit) {
         val current = _uiState.value
         if (!current.canSave || current.isSaving) return
@@ -69,12 +75,13 @@ class NoteEditorViewModel(
                 id = current.noteId ?: 0L,
                 title = current.title.trim(),
                 content = current.content.trim(),
-                tags = emptyList()
+                tags = current.tagsInput.toTagList().distinct()
             )
             val newId = repository.upsertNote(note)
             _uiState.update {
                 it.copy(
                     noteId = it.noteId ?: newId,
+                    tagsInput = note.tags.joinToString(", "),
                     isSaving = false
                 )
             }
@@ -106,3 +113,8 @@ class NoteEditorViewModel(
         }
     }
 }
+
+private fun String.toTagList(): List<String> =
+    split(",")
+        .map { it.trim() }
+        .filter { it.isNotEmpty() }
