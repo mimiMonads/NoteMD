@@ -26,13 +26,16 @@
     <string name="settings_sync_description">Automatically synchronize notes across devices (Place Holder!)</string>
     <string name="settings_about_title">NoteMD</string>
     <string name="settings_about_body">NoteMD keeps your markdown notes tidy without any fuss.</string>
-    <string name="tokens_instructions">Drag the words around to practice ordering a recovery phrase.</string>
+    <string name="tokens_instructions">Drag the words around.</string>
     <string name="tokens_tray_title">Word tray</string>
     <string name="tokens_hint">Tap or drag any token to get started.</string>
     <string name="tokens_empty_tray">Nice work—everything is in the drop zone.</string>
     <string name="tokens_drop_label">Drop tokens here</string>
     <string name="tokens_drop_placeholder">Drop tokens here whenever you’re ready.</string>
     <string name="tokens_reset">Start over</string>
+    <string name="tokens_hash_title">Normalized tokens</string>
+    <string name="tokens_hash_normalized">Sorted: %1$s</string>
+    <string name="tokens_hash_value">SHA-1: %1$s</string>
     <string name="note_detail_title_fallback">Note details</string>
     <string name="note_detail_navigate_home">Go back</string>
 </resources>

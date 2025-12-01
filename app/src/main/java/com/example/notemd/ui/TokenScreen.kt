@@ -14,11 +14,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -40,9 +41,11 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.notemd.R
+import java.security.MessageDigest
 
 private val SeedWordSaver = listSaver<List<String>, String>(
     save = { it },
@@ -76,15 +79,21 @@ fun TokenPracticeScreen(
     fun List<String>.sortedByOriginalOrder(): List<String> =
         sortedBy { tokenOrder[it] ?: Int.MAX_VALUE }
 
+    fun List<String>.sortedNormalized(): List<String> =
+        sortedBy { it.lowercase() }
+
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+            .verticalScroll(scrollState)
+            .padding(horizontal = 8.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         Text(
             text = stringResource(id = R.string.tokens_instructions),
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodySmall
         )
 
         Card(
@@ -122,7 +131,7 @@ fun TokenPracticeScreen(
                                 dropBounds = dropBounds,
                                 onDropped = { dropped ->
                                     if (dropped !in droppedTokens) {
-                                        droppedTokens = droppedTokens + dropped
+                                        droppedTokens = (droppedTokens + dropped).sortedNormalized()
                                         trayTokens = trayTokens.filterNot { it == dropped }
                                     }
                                 },
@@ -145,6 +154,19 @@ fun TokenPracticeScreen(
             },
             onTrayHoverChange = { trayActive = it }
         )
+
+        val normalizedTokens = remember(droppedTokens) { droppedTokens.sortedNormalized() }
+        val normalizedTokenString = remember(normalizedTokens) { normalizedTokens.joinToString(" ") }
+        val tokenSha1 = remember(normalizedTokenString) {
+            if (normalizedTokenString.isEmpty()) "" else sha1(normalizedTokenString)
+        }
+
+        if (normalizedTokens.isNotEmpty()) {
+            TokenHashSummary(
+                tokensString = normalizedTokenString,
+                sha1Hash = tokenSha1
+            )
+        }
 
         if (droppedTokens.isNotEmpty() || trayTokens.size != defaultTokens.size) {
             OutlinedButton(
@@ -176,7 +198,7 @@ private fun TokenDropZone(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 200.dp)
+            .heightIn(min = 160.dp, max = 360.dp)
             .onGloballyPositioned { coords -> onBoundsReady(coords.boundsInRoot()) },
         shape = RoundedCornerShape(24.dp),
         border = BorderStroke(
@@ -189,7 +211,7 @@ private fun TokenDropZone(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp),
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
@@ -355,4 +377,46 @@ private fun DraggableTokenChip(
         }
 
     content(dragModifier)
+}
+
+@Composable
+private fun TokenHashSummary(
+    tokensString: String,
+    sha1Hash: String
+) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        tonalElevation = 2.dp,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+    ) {
+         Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = stringResource(id = R.string.tokens_hash_title),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+            Text(
+                text = stringResource(id = R.string.tokens_hash_normalized, tokensString),
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = stringResource(id = R.string.tokens_hash_value, sha1Hash),
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Medium
+            )
+        }
+    }
+}
+
+private fun sha1(input: String): String {
+    val digest = MessageDigest.getInstance("SHA-1")
+    return digest.digest(input.toByteArray())
+        .joinToString(separator = "") { "%02x".format() }
 }
