@@ -34,12 +34,15 @@ import com.example.notemd.ui.theme.NoteMDTheme
  * TODO: add some real info
  */
 @Composable
-fun SettingsScreen() {
-    var darkThemeEnabled by rememberSaveable { mutableStateOf(false) }
+fun SettingsScreen(
+    darkThemeEnabled: Boolean,
+    onDarkThemeChanged: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
     var syncEnabled by rememberSaveable { mutableStateOf(true) }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp, vertical = 24.dp),
@@ -49,7 +52,7 @@ fun SettingsScreen() {
             title = stringResource(id = R.string.settings_dark_mode),
             subtitle = stringResource(id = R.string.settings_dark_mode_description),
             checked = darkThemeEnabled,
-            onCheckedChange = { darkThemeEnabled = it }
+            onCheckedChange = onDarkThemeChanged
         )
 
         SettingsToggleRow(
@@ -125,6 +128,9 @@ private fun SettingsToggleRow(
 @Composable
 private fun PreviewSettingsScreen() {
     NoteMDTheme {
-        SettingsScreen()
+        SettingsScreen(
+            darkThemeEnabled = true,
+            onDarkThemeChanged = {}
+        )
     }
 }

@@ -418,5 +418,5 @@ private fun TokenHashSummary(
 private fun sha1(input: String): String {
     val digest = MessageDigest.getInstance("SHA-1")
     return digest.digest(input.toByteArray())
-        .joinToString(separator = "") { "%02x".format() }
+        .joinToString(separator = "") { "%02x".format(it) }
 }

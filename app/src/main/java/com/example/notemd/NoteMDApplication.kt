@@ -4,6 +4,7 @@ import android.app.Application
 import com.example.notemd.data.NoteRepository
 import com.example.notemd.data.local.NoteDatabase
 import com.example.notemd.data.local.NoteFileStore
+import com.example.notemd.data.SettingsRepository
 
 class NoteMDApplication : Application() {
 
@@ -18,12 +19,14 @@ class NoteMDApplication : Application() {
 
 interface AppContainer {
     val noteRepository: NoteRepository
+    val settingsRepository: SettingsRepository
 }
 
 private class DefaultAppContainer(application: Application) : AppContainer {
 
     private val database by lazy { NoteDatabase.getDatabase(application) }
     private val noteFileStore by lazy { NoteFileStore(application) }
+    private val settingsRepositoryInternal by lazy { SettingsRepository(application) }
 
     override val noteRepository: NoteRepository by lazy {
         NoteRepository(
@@ -31,4 +34,7 @@ private class DefaultAppContainer(application: Application) : AppContainer {
             noteFileStore = noteFileStore
         )
     }
+
+    override val settingsRepository: SettingsRepository
+        get() = settingsRepositoryInternal
 }

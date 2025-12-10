@@ -46,7 +46,9 @@ enum class NoteMDSection(val labelRes: Int) {
 @Composable
 fun NoteMDApp(
     modifier: Modifier = Modifier,
-    previewUiState: NoteListUiState? = null
+    previewUiState: NoteListUiState? = null,
+    settingsUiState: SettingsUiState = SettingsUiState(),
+    onDarkModeToggle: (Boolean) -> Unit = {}
 ) {
     var currentSection by rememberSaveable { mutableStateOf(NoteMDSection.Main) }
     var noteToEditId by rememberSaveable { mutableStateOf<Long?>(null) }
@@ -124,7 +126,10 @@ fun NoteMDApp(
                     }
                 )
                 NoteMDSection.Tokens -> TokenPracticeScreen()
-                NoteMDSection.Settings -> SettingsScreen()
+                NoteMDSection.Settings -> SettingsScreen(
+                    darkThemeEnabled = settingsUiState.darkThemeEnabled,
+                    onDarkThemeChanged = onDarkModeToggle
+                )
             }
         }
     }
