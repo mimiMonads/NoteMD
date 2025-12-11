@@ -26,11 +26,12 @@ import com.example.notemd.ui.theme.NoteMDTheme
 @Composable
 fun NoteScreen(
     noteId: Long?,
+    editorSession: Int,
     onSaved: () -> Unit = {},
     onDeleted: () -> Unit = {}
 ) {
     val editorViewModel: NoteEditorViewModel = viewModel(
-        key = "noteEditor-${noteId ?: "new"}",
+        key = "noteEditor-${noteId ?: "new"}-$editorSession",
         factory = NoteEditorViewModel.Factory(noteId)
     )
     val uiState by editorViewModel.uiState.collectAsStateWithLifecycle()

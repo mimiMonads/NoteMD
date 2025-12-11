@@ -52,6 +52,7 @@ fun NoteMDApp(
 ) {
     var currentSection by rememberSaveable { mutableStateOf(NoteMDSection.Main) }
     var noteToEditId by rememberSaveable { mutableStateOf<Long?>(null) }
+    var noteEditorSession by rememberSaveable { mutableStateOf(0) }
 
     val notesViewModel: NotesViewModel? = if (previewUiState == null) {
         viewModel(factory = NotesViewModel.Factory)
@@ -87,6 +88,7 @@ fun NoteMDApp(
                 ExtendedFloatingActionButton(
                     onClick = {
                         noteToEditId = null
+                        noteEditorSession++
                         currentSection = NoteMDSection.Note
                     },
                 ) {
@@ -111,11 +113,13 @@ fun NoteMDApp(
                     notes = noteListUiState.notes,
                     onNoteSelected = { note ->
                         noteToEditId = note.id
+                        noteEditorSession++
                         currentSection = NoteMDSection.Note
                     }
                 )
                 NoteMDSection.Note -> NoteScreen(
                     noteId = noteToEditId,
+                    editorSession = noteEditorSession,
                     onSaved = {
                         noteToEditId = null
                         currentSection = NoteMDSection.Main
