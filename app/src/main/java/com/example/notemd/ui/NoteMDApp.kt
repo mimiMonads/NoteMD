@@ -3,12 +3,15 @@ package com.example.notemd.ui
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -29,12 +32,19 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.notemd.R
 import com.example.notemd.ui.theme.NoteMDTheme
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 
 enum class NoteMDSection(val labelRes: Int) {
     Main(R.string.section_overview),
     Note(R.string.section_note),
     Tokens(R.string.section_tokens),
     Settings(R.string.section_settings)
+}
+
+private enum class NoteMDNavigationType {
+    BottomBar,
+    NavigationRail
 }
 
 /**
@@ -48,7 +58,8 @@ fun NoteMDApp(
     modifier: Modifier = Modifier,
     previewUiState: NoteListUiState? = null,
     settingsUiState: SettingsUiState = SettingsUiState(),
-    onDarkModeToggle: (Boolean) -> Unit = {}
+    onDarkModeToggle: (Boolean) -> Unit = {},
+    windowSizeClass: WindowSizeClass? = null
 ) {
     var currentSection by rememberSaveable { mutableStateOf(NoteMDSection.Main) }
     var noteToEditId by rememberSaveable { mutableStateOf<Long?>(null) }
@@ -73,6 +84,10 @@ fun NoteMDApp(
     }
 
     val appBarScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val navigationType = when (windowSizeClass?.widthSizeClass) {
+        WindowWidthSizeClass.Medium, WindowWidthSizeClass.Expanded -> NoteMDNavigationType.NavigationRail
+        else -> NoteMDNavigationType.BottomBar
+    }
 
     Scaffold(
         modifier = modifier,
@@ -97,43 +112,55 @@ fun NoteMDApp(
             }
         },
         bottomBar = {
-            NoteMDBottomBar(
-                currentSection = currentSection,
-                onSectionSelected = { currentSection = it }
-            )
+            if (navigationType == NoteMDNavigationType.BottomBar) {
+                NoteMDBottomBar(
+                    currentSection = currentSection,
+                    onSectionSelected = { currentSection = it }
+                )
+            }
         }
     ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            when (currentSection) {
-                NoteMDSection.Main -> MainScreen(
-                    notes = noteListUiState.notes,
-                    onNoteSelected = { note ->
-                        noteToEditId = note.id
-                        noteEditorSession++
-                        currentSection = NoteMDSection.Note
-                    }
+        Row(modifier = Modifier.fillMaxSize()) {
+            if (navigationType == NoteMDNavigationType.NavigationRail) {
+                NoteMDNavigationRail(
+                    currentSection = currentSection,
+                    onSectionSelected = { currentSection = it }
                 )
-                NoteMDSection.Note -> NoteScreen(
-                    noteId = noteToEditId,
-                    editorSession = noteEditorSession,
-                    onSaved = {
-                        noteToEditId = null
-                        currentSection = NoteMDSection.Main
-                    },
-                    onDeleted = {
-                        noteToEditId = null
-                        currentSection = NoteMDSection.Main
-                    }
-                )
-                NoteMDSection.Tokens -> TokenPracticeScreen()
-                NoteMDSection.Settings -> SettingsScreen(
-                    darkThemeEnabled = settingsUiState.darkThemeEnabled,
-                    onDarkThemeChanged = onDarkModeToggle
-                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                when (currentSection) {
+                    NoteMDSection.Main -> MainScreen(
+                        notes = noteListUiState.notes,
+                        onNoteSelected = { note ->
+                            noteToEditId = note.id
+                            noteEditorSession++
+                            currentSection = NoteMDSection.Note
+                        }
+                    )
+                    NoteMDSection.Note -> NoteScreen(
+                        noteId = noteToEditId,
+                        editorSession = noteEditorSession,
+                        onSaved = {
+                            noteToEditId = null
+                            currentSection = NoteMDSection.Main
+                        },
+                        onDeleted = {
+                            noteToEditId = null
+                            currentSection = NoteMDSection.Main
+                        }
+                    )
+                    NoteMDSection.Tokens -> TokenPracticeScreen()
+                    NoteMDSection.Settings -> SettingsScreen(
+                        darkThemeEnabled = settingsUiState.darkThemeEnabled,
+                        onDarkThemeChanged = onDarkModeToggle
+                    )
+                }
             }
         }
     }
@@ -164,6 +191,30 @@ private fun NoteMDBottomBar(
                 label = { Text(text = stringResource(id = section.labelRes)) }
             )
         }
+    }
+}
+
+@Composable
+private fun NoteMDNavigationRail(
+    currentSection: NoteMDSection,
+    onSectionSelected: (NoteMDSection) -> Unit
+) {
+    NavigationRail {
+        NoteMDSection.values()
+            .filter { it != NoteMDSection.Note }
+            .forEach { section ->
+                NavigationRailItem(
+                    selected = currentSection == section,
+                    onClick = { onSectionSelected(section) },
+                    icon = {
+                        SectionIconBadge(
+                            label = stringResource(id = section.labelRes),
+                            isSelected = currentSection == section
+                        )
+                    },
+                    label = { Text(text = stringResource(id = section.labelRes)) }
+                )
+            }
     }
 }
 
