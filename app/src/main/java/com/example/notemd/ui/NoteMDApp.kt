@@ -64,6 +64,7 @@ fun NoteMDApp(
     var currentSection by rememberSaveable { mutableStateOf(NoteMDSection.Main) }
     var noteToEditId by rememberSaveable { mutableStateOf<Long?>(null) }
     var noteEditorSession by rememberSaveable { mutableStateOf(0) }
+    var tokenList by rememberSaveable(stateSaver = TokenListSaver) { mutableStateOf(DefaultTokenList) }
 
     val notesViewModel: NotesViewModel? = if (previewUiState == null) {
         viewModel(factory = NotesViewModel.Factory)
@@ -155,7 +156,10 @@ fun NoteMDApp(
                             currentSection = NoteMDSection.Main
                         }
                     )
-                    NoteMDSection.Tokens -> TokenPracticeScreen()
+                    NoteMDSection.Tokens -> TokenPracticeScreen(
+                        tokens = tokenList,
+                        onTokensUpdated = { tokenList = it }
+                    )
                     NoteMDSection.Settings -> SettingsScreen(
                         darkThemeEnabled = settingsUiState.darkThemeEnabled,
                         onDarkThemeChanged = onDarkModeToggle

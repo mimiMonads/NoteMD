@@ -20,15 +20,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -47,11 +48,6 @@ import androidx.compose.ui.zIndex
 import com.example.notemd.R
 import java.security.MessageDigest
 
-private val SeedWordSaver = listSaver<List<String>, String>(
-    save = { it },
-    restore = { it }
-)
-
 /**
  * TODO:
  * Small drag-and-drop playground.
@@ -59,21 +55,21 @@ private val SeedWordSaver = listSaver<List<String>, String>(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TokenPracticeScreen(
+    tokens: List<String> = DefaultTokenList,
+    onTokensUpdated: (List<String>) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
 
-    // TODO: import a list and divide it
-    val defaultTokens = remember {
-        listOf("orbit", "ember", "solstice", "lumen", "grove", "delta", "radial", "cinder", "kepler", "breeze", "cobalt", "zenith")
-    }
-    val tokenOrder = remember { defaultTokens.withIndex().associate { it.value to it.index } }
+    val tokenOrder = remember(tokens) { tokens.withIndex().associate { it.value to it.index } }
 
-    var trayTokens by rememberSaveable(stateSaver = SeedWordSaver) { mutableStateOf(defaultTokens) }
-    var droppedTokens by rememberSaveable(stateSaver = SeedWordSaver) { mutableStateOf(emptyList<String>()) }
+    var trayTokens by rememberSaveable(tokens, stateSaver = TokenListSaver) { mutableStateOf(tokens) }
+    var droppedTokens by rememberSaveable(tokens, stateSaver = TokenListSaver) { mutableStateOf(emptyList<String>()) }
     var dropBounds by remember { mutableStateOf<Rect?>(null) }
     var trayBounds by remember { mutableStateOf<Rect?>(null) }
     var dropActive by remember { mutableStateOf(false) }
     var trayActive by remember { mutableStateOf(false) }
+    var tokenInput by rememberSaveable(tokens) { mutableStateOf(tokens.joinToString(" ")) }
+    val parsedTokens = remember(tokenInput) { tokenInput.toTokenList() }
 
     // Helper to keep tokens sorted even after we stuff them back into the tray.
     fun List<String>.sortedByOriginalOrder(): List<String> =
@@ -91,6 +87,18 @@ fun TokenPracticeScreen(
             .padding(horizontal = 8.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
+        TokenBuilderCard(
+            tokenInput = tokenInput,
+            parsedTokens = parsedTokens,
+            currentCount = tokens.size,
+            onTokenInputChange = { tokenInput = it },
+            onApplyTokens = {
+                if (parsedTokens.isNotEmpty()) {
+                    onTokensUpdated(parsedTokens)
+                }
+            }
+        )
+
         Text(
             text = stringResource(id = R.string.tokens_instructions),
             style = MaterialTheme.typography.bodySmall
@@ -168,14 +176,66 @@ fun TokenPracticeScreen(
             )
         }
 
-        if (droppedTokens.isNotEmpty() || trayTokens.size != defaultTokens.size) {
+        if (droppedTokens.isNotEmpty() || trayTokens.size != tokens.size) {
             OutlinedButton(
                 onClick = {
-                    trayTokens = defaultTokens
+                    trayTokens = tokens
                     droppedTokens = emptyList()
                 }
             ) {
                 Text(text = stringResource(id = R.string.tokens_reset))
+            }
+        }
+    }
+}
+
+@Composable
+private fun TokenBuilderCard(
+    tokenInput: String,
+    parsedTokens: List<String>,
+    currentCount: Int,
+    onTokenInputChange: (String) -> Unit,
+    onApplyTokens: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        shape = RoundedCornerShape(20.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = stringResource(id = R.string.tokens_builder_title),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+            Text(
+                text = stringResource(id = R.string.tokens_builder_description),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            OutlinedTextField(
+                value = tokenInput,
+                onValueChange = onTokenInputChange,
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text(text = stringResource(id = R.string.tokens_builder_label)) },
+                placeholder = { Text(text = stringResource(id = R.string.tokens_builder_placeholder)) },
+                minLines = 2
+            )
+            Text(
+                text = stringResource(id = R.string.tokens_builder_active_count, currentCount),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Button(
+                onClick = onApplyTokens,
+                enabled = parsedTokens.isNotEmpty(),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = stringResource(id = R.string.tokens_builder_use))
             }
         }
     }
@@ -420,3 +480,8 @@ private fun sha1(input: String): String {
     return digest.digest(input.toByteArray())
         .joinToString(separator = "") { "%02x".format(it) }
 }
+
+private fun String.toTokenList(): List<String> =
+    split(Regex("[,\\s]+"))
+        .map { it.trim() }
+        .filter { it.isNotEmpty() }

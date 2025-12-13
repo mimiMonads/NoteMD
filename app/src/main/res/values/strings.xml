@@ -27,6 +27,12 @@
     <string name="settings_about_title">NoteMD</string>
     <string name="settings_about_body">NoteMD keeps your markdown notes tidy without any fuss.</string>
     <string name="tokens_instructions">Drag the words around.</string>
+    <string name="tokens_builder_title">Create a token combo</string>
+    <string name="tokens_builder_description">Enter words separated by spaces or commas. We&#39;ll remember them while the app is open so you can practice later.</string>
+    <string name="tokens_builder_label">Tokens</string>
+    <string name="tokens_builder_placeholder">orbit ember solstice lumen...</string>
+    <string name="tokens_builder_use">Store tokens in memory</string>
+    <string name="tokens_builder_active_count">Currently storing %1$d tokens</string>
     <string name="tokens_tray_title">Word tray</string>
     <string name="tokens_hint">Tap or drag any token to get started.</string>
     <string name="tokens_empty_tray">Nice work—everything is in the drop zone.</string>
