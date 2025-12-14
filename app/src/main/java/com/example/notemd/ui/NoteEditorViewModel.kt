@@ -8,6 +8,8 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.notemd.NoteMDApplication
 import com.example.notemd.data.Note
 import com.example.notemd.data.NoteRepository
+import com.example.notemd.token.TokenSessionManager
+import com.example.notemd.token.TokenUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,6 +33,7 @@ data class NoteEditorUiState(
 
 class NoteEditorViewModel(
     private val repository: NoteRepository,
+    private val tokenSessionManager: TokenSessionManager,
     private val initialNoteId: Long?
 ) : ViewModel() {
 
@@ -42,7 +45,8 @@ class NoteEditorViewModel(
     init {
         initialNoteId?.let { id ->
             viewModelScope.launch {
-                repository.getNote(id)?.let { note ->
+                val tokenHash = tokenSessionManager.getActiveOrDefault()
+                repository.getNote(id, tokenHash)?.let { note ->
                     _uiState.update {
                         it.copy(
                             noteId = note.id,
@@ -76,15 +80,17 @@ class NoteEditorViewModel(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true) }
+            val tokenHash = tokenSessionManager.getActiveOrDefault()
             val note = Note(
                 id = current.noteId ?: 0L,
                 title = current.title.trim(),
                 content = current.content.trim(),
                 tags = current.tagsInput.toTagList().distinct(),
                 latitude = current.latitude,
-                longitude = current.longitude
+                longitude = current.longitude,
+                tokenHash = tokenHash
             )
-            val newId = repository.upsertNote(note)
+            val newId = repository.upsertNote(note, tokenHash)
             _uiState.update {
                 it.copy(
                     noteId = it.noteId ?: newId,
@@ -102,7 +108,8 @@ class NoteEditorViewModel(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isDeleting = true) }
-            repository.deleteNote(id)
+            val tokenHash = tokenSessionManager.getActiveOrDefault()
+            repository.deleteNote(id, tokenHash)
             _uiState.value = NoteEditorUiState()
             onDeleted()
         }
@@ -122,6 +129,7 @@ class NoteEditorViewModel(
                 val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as NoteMDApplication)
                 NoteEditorViewModel(
                     repository = application.container.noteRepository,
+                    tokenSessionManager = application.container.tokenSessionManager,
                     initialNoteId = noteId
                 )
             }

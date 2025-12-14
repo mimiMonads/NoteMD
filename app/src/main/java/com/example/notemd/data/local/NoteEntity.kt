@@ -14,6 +14,7 @@ data class NoteEntity(
     val tags: String,
     val latitude: Double?,
     val longitude: Double?,
+    val tokenHash: String,
     val lastUpdated: Long
 )
 
@@ -25,6 +26,7 @@ internal fun NoteEntity.toDomain(): Note =
         tags = tags.toTagList(),
         latitude = latitude,
         longitude = longitude,
+        tokenHash = tokenHash,
         lastUpdated = lastUpdated
     )
 
@@ -36,6 +38,7 @@ internal fun Note.toEntity(): NoteEntity =
         tags = tags.toJsonTagString(),
         latitude = latitude,
         longitude = longitude,
+        tokenHash = tokenHash,
         lastUpdated = lastUpdated
     )
 

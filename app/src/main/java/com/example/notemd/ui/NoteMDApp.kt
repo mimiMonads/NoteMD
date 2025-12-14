@@ -34,6 +34,7 @@ import com.example.notemd.R
 import com.example.notemd.ui.theme.NoteMDTheme
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import com.example.notemd.token.TokenSessionManager
 
 enum class NoteMDSection(val labelRes: Int) {
     Main(R.string.section_overview),
@@ -60,6 +61,7 @@ fun NoteMDApp(
     settingsUiState: SettingsUiState = SettingsUiState(),
     onDarkModeToggle: (Boolean) -> Unit = {},
     onLocationToggle: (Boolean) -> Unit = {},
+    tokenSessionManager: TokenSessionManager = TokenSessionManager(),
     windowSizeClass: WindowSizeClass? = null
 ) {
     var currentSection by rememberSaveable { mutableStateOf(NoteMDSection.Main) }
@@ -160,7 +162,10 @@ fun NoteMDApp(
                     )
                     NoteMDSection.Tokens -> TokenPracticeScreen(
                         tokens = tokenList,
-                        onTokensUpdated = { tokenList = it }
+                        onTokensUpdated = { tokenList = it },
+                        onUnlockWithTokens = { tokens ->
+                            tokenSessionManager.unlock(tokens)
+                        }
                     )
                     NoteMDSection.Settings -> SettingsScreen(
                         darkThemeEnabled = settingsUiState.darkThemeEnabled,

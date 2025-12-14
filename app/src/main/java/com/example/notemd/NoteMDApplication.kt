@@ -5,6 +5,7 @@ import com.example.notemd.data.NoteRepository
 import com.example.notemd.data.local.NoteDatabase
 import com.example.notemd.data.local.NoteFileStore
 import com.example.notemd.data.SettingsRepository
+import com.example.notemd.token.TokenSessionManager
 
 class NoteMDApplication : Application() {
 
@@ -20,6 +21,7 @@ class NoteMDApplication : Application() {
 interface AppContainer {
     val noteRepository: NoteRepository
     val settingsRepository: SettingsRepository
+    val tokenSessionManager: TokenSessionManager
 }
 
 private class DefaultAppContainer(application: Application) : AppContainer {
@@ -27,6 +29,7 @@ private class DefaultAppContainer(application: Application) : AppContainer {
     private val database by lazy { NoteDatabase.getDatabase(application) }
     private val noteFileStore by lazy { NoteFileStore(application) }
     private val settingsRepositoryInternal by lazy { SettingsRepository(application) }
+    private val tokenSessionManagerInternal by lazy { TokenSessionManager() }
 
     override val noteRepository: NoteRepository by lazy {
         NoteRepository(
@@ -37,4 +40,7 @@ private class DefaultAppContainer(application: Application) : AppContainer {
 
     override val settingsRepository: SettingsRepository
         get() = settingsRepositoryInternal
+
+    override val tokenSessionManager: TokenSessionManager
+        get() = tokenSessionManagerInternal
 }

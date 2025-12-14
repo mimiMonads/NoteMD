@@ -9,7 +9,9 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.notemd.NoteMDApplication
 import com.example.notemd.data.Note
 import com.example.notemd.data.NoteRepository
+import com.example.notemd.token.TokenSessionManager
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -19,10 +21,18 @@ data class NoteListUiState(
 )
 
 class NotesViewModel(
-    private val repository: NoteRepository
+    private val repository: NoteRepository,
+    private val tokenSessionManager: TokenSessionManager
 ) : ViewModel() {
 
-    val uiState = repository.notes
+    val uiState = tokenSessionManager.activeTokenHash
+        .flatMapLatest { tokenHash ->
+            if (tokenHash.isNullOrEmpty()) {
+                repository.notes(com.example.notemd.token.TokenUtils.defaultTokenHash)
+            } else {
+                repository.notes(tokenHash)
+            }
+        }
         .map { notes -> NoteListUiState(notes = notes.map { it.toPreview() }) }
         .stateIn(
             scope = viewModelScope,
@@ -32,7 +42,9 @@ class NotesViewModel(
 
     fun deleteNote(id: Long) {
         viewModelScope.launch {
-            repository.deleteNote(id)
+            val tokenHash = tokenSessionManager.activeTokenHash.value
+                ?: com.example.notemd.token.TokenUtils.defaultTokenHash
+            repository.deleteNote(id, tokenHash)
         }
     }
 
@@ -40,7 +52,10 @@ class NotesViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as NoteMDApplication)
-                NotesViewModel(application.container.noteRepository)
+                NotesViewModel(
+                    repository = application.container.noteRepository,
+                    tokenSessionManager = application.container.tokenSessionManager
+                )
             }
         }
     }

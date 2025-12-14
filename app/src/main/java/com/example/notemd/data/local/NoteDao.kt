@@ -9,14 +9,14 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface NoteDao {
 
-    @Query("SELECT * FROM notes ORDER BY lastUpdated DESC")
-    fun observeNotes(): Flow<List<NoteEntity>>
+    @Query("SELECT * FROM notes WHERE tokenHash = :tokenHash ORDER BY lastUpdated DESC")
+    fun observeNotes(tokenHash: String): Flow<List<NoteEntity>>
 
-    @Query("SELECT * FROM notes WHERE id = :id")
-    fun observeNoteById(id: Long): Flow<NoteEntity?>
+    @Query("SELECT * FROM notes WHERE id = :id AND tokenHash = :tokenHash")
+    fun observeNoteById(id: Long, tokenHash: String): Flow<NoteEntity?>
 
-    @Query("SELECT * FROM notes WHERE id = :id")
-    suspend fun getNoteById(id: Long): NoteEntity?
+    @Query("SELECT * FROM notes WHERE id = :id AND tokenHash = :tokenHash")
+    suspend fun getNoteById(id: Long, tokenHash: String): NoteEntity?
 
     @Upsert
     suspend fun upsert(note: NoteEntity): Long
@@ -24,8 +24,8 @@ interface NoteDao {
     @Delete
     suspend fun delete(note: NoteEntity)
 
-    @Query("DELETE FROM notes WHERE id = :id")
-    suspend fun deleteById(id: Long)
+    @Query("DELETE FROM notes WHERE id = :id AND tokenHash = :tokenHash")
+    suspend fun deleteById(id: Long, tokenHash: String)
 
     @Query("DELETE FROM notes")
     suspend fun deleteAll()

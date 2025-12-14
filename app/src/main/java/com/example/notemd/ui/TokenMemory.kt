@@ -5,20 +5,9 @@ import androidx.compose.runtime.saveable.listSaver
 /**
  * Shared token defaults + saver so we can remember custom combinations in memory.
  */
-val DefaultTokenList = listOf(
-    "orbit",
-    "ember",
-    "solstice",
-    "lumen",
-    "grove",
-    "delta",
-    "radial",
-    "cinder",
-    "kepler",
-    "breeze",
-    "cobalt",
-    "zenith"
-)
+import com.example.notemd.token.DEFAULT_TOKENS
+
+val DefaultTokenList = DEFAULT_TOKENS
 
 val TokenListSaver = listSaver<List<String>, String>(
     save = { it },

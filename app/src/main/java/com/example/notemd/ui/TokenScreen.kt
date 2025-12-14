@@ -46,7 +46,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.notemd.R
-import java.security.MessageDigest
+import com.example.notemd.token.TokenUtils
 
 /**
  * TODO:
@@ -57,6 +57,7 @@ import java.security.MessageDigest
 fun TokenPracticeScreen(
     tokens: List<String> = DefaultTokenList,
     onTokensUpdated: (List<String>) -> Unit = {},
+    onUnlockWithTokens: (List<String>) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
 
@@ -69,7 +70,7 @@ fun TokenPracticeScreen(
     var dropActive by remember { mutableStateOf(false) }
     var trayActive by remember { mutableStateOf(false) }
     var tokenInput by rememberSaveable(tokens) { mutableStateOf(tokens.joinToString(" ")) }
-    val parsedTokens = remember(tokenInput) { tokenInput.toTokenList() }
+    val parsedTokens = remember(tokenInput) { TokenUtils.stringToTokens(tokenInput) }
 
     // Helper to keep tokens sorted even after we stuff them back into the tray.
     fun List<String>.sortedByOriginalOrder(): List<String> =
@@ -165,15 +166,19 @@ fun TokenPracticeScreen(
 
         val normalizedTokens = remember(droppedTokens) { droppedTokens.sortedNormalized() }
         val normalizedTokenString = remember(normalizedTokens) { normalizedTokens.joinToString(" ") }
-        val tokenSha1 = remember(normalizedTokenString) {
-            if (normalizedTokenString.isEmpty()) "" else sha1(normalizedTokenString)
-        }
+        val tokenSha1 = remember(normalizedTokens) { TokenUtils.hashTokens(normalizedTokens) }
 
         if (normalizedTokens.isNotEmpty()) {
             TokenHashSummary(
                 tokensString = normalizedTokenString,
                 sha1Hash = tokenSha1
             )
+            Button(
+                onClick = { onUnlockWithTokens(normalizedTokens) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = stringResource(id = R.string.tokens_builder_use))
+            }
         }
 
         if (droppedTokens.isNotEmpty() || trayTokens.size != tokens.size) {
@@ -474,14 +479,3 @@ private fun TokenHashSummary(
         }
     }
 }
-
-private fun sha1(input: String): String {
-    val digest = MessageDigest.getInstance("SHA-1")
-    return digest.digest(input.toByteArray())
-        .joinToString(separator = "") { "%02x".format(it) }
-}
-
-private fun String.toTokenList(): List<String> =
-    split(Regex("[,\\s]+"))
-        .map { it.trim() }
-        .filter { it.isNotEmpty() }

@@ -12,16 +12,19 @@ class NoteRepository(
     private val noteFileStore: NoteFileStore
 ) {
 
-    val notes: Flow<List<Note>> =
-        noteDao.observeNotes().map { entities -> entities.map { it.toDomain() } }
+    fun notes(tokenHash: String): Flow<List<Note>> =
+        noteDao.observeNotes(tokenHash).map { entities -> entities.map { it.toDomain() } }
 
-    fun observeNote(id: Long): Flow<Note?> =
-        noteDao.observeNoteById(id).map { it?.toDomain() }
+    fun observeNote(id: Long, tokenHash: String): Flow<Note?> =
+        noteDao.observeNoteById(id, tokenHash).map { it?.toDomain() }
 
-    suspend fun getNote(id: Long): Note? = noteDao.getNoteById(id)?.toDomain()
+    suspend fun getNote(id: Long, tokenHash: String): Note? = noteDao.getNoteById(id, tokenHash)?.toDomain()
 
-    suspend fun upsertNote(note: Note): Long {
-        val updatedNote = note.copy(lastUpdated = System.currentTimeMillis())
+    suspend fun upsertNote(note: Note, tokenHash: String): Long {
+        val updatedNote = note.copy(
+            lastUpdated = System.currentTimeMillis(),
+            tokenHash = tokenHash
+        )
         val entity = updatedNote.toEntity()
         val id = noteDao.upsert(entity)
         val storedId = if (entity.id != 0L) entity.id else id
@@ -29,8 +32,8 @@ class NoteRepository(
         return id
     }
 
-    suspend fun deleteNote(id: Long) {
-        noteDao.deleteById(id)
-        noteFileStore.delete(id)
+    suspend fun deleteNote(id: Long, tokenHash: String) {
+        noteDao.deleteById(id, tokenHash)
+        noteFileStore.delete(id, tokenHash)
     }
 }

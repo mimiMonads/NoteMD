@@ -61,6 +61,8 @@ dependencies {
     implementation(libs.google.play.services.location)
     kapt(libs.androidx.room.compiler)
     testImplementation(libs.junit)
+    testImplementation("org.json:json:20231013")
+    testImplementation("org.robolectric:robolectric:4.12.2")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
