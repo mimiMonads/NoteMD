@@ -10,6 +10,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -29,6 +30,7 @@ import kotlin.math.sqrt
 class MainActivity : ComponentActivity(), SensorEventListener {
     private var sensorManager: SensorManager? = null
     private var accelerometer: Sensor? = null
+    @Volatile private var shakeResetEnabled: Boolean = true
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,6 +43,9 @@ class MainActivity : ComponentActivity(), SensorEventListener {
             val settingsViewModel: SettingsViewModel = viewModel(factory = SettingsViewModel.Factory)
             val settingsUiState by settingsViewModel.uiState.collectAsStateWithLifecycle()
             val tokenSessionManager = (application as NoteMDApplication).container.tokenSessionManager
+            LaunchedEffect(settingsUiState.shakeResetEnabled) {
+                shakeResetEnabled = settingsUiState.shakeResetEnabled
+            }
 
             NoteMDTheme(useDarkTheme = settingsUiState.darkThemeEnabled) {
                 // Keep the real app entry the same as the previews for consistency.
@@ -49,6 +54,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                     settingsUiState = settingsUiState,
                     onDarkModeToggle = settingsViewModel::setDarkThemeEnabled,
                     onLocationToggle = settingsViewModel::setLocationAllowed,
+                    onShakeResetToggle = settingsViewModel::setShakeResetEnabled,
                     tokenSessionManager = tokenSessionManager
                 )
             }
@@ -79,7 +85,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         val y = event.values[1]
         val z = event.values[2]
         val gForce = sqrt((x * x + y * y + z * z).toDouble()) / SensorManager.GRAVITY_EARTH
-        if (gForce > 2.7f) {
+        if (shakeResetEnabled && gForce > 2.7f) {
             (application as NoteMDApplication).container.tokenSessionManager.clear()
         }
     }

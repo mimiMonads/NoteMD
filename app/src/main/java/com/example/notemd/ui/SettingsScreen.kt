@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -35,6 +36,9 @@ fun SettingsScreen(
     onDarkThemeChanged: (Boolean) -> Unit,
     locationAllowed: Boolean,
     onLocationToggle: (Boolean) -> Unit,
+    shakeResetEnabled: Boolean,
+    onShakeResetToggle: (Boolean) -> Unit,
+    onResetTokens: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -57,6 +61,20 @@ fun SettingsScreen(
             checked = locationAllowed,
             onCheckedChange = onLocationToggle
         )
+
+        SettingsToggleRow(
+            title = stringResource(id = R.string.settings_shake_reset_title),
+            subtitle = stringResource(id = R.string.settings_shake_reset_description),
+            checked = shakeResetEnabled,
+            onCheckedChange = onShakeResetToggle
+        )
+
+        Button(
+            onClick = onResetTokens,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = stringResource(id = R.string.settings_reset_tokens))
+        }
 
         Divider()
 
@@ -128,7 +146,10 @@ private fun PreviewSettingsScreen() {
             darkThemeEnabled = true,
             onDarkThemeChanged = {},
             locationAllowed = true,
-            onLocationToggle = {}
+            onLocationToggle = {},
+            shakeResetEnabled = true,
+            onShakeResetToggle = {},
+            onResetTokens = {}
         )
     }
 }

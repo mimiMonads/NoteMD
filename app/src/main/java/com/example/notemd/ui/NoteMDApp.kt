@@ -1,10 +1,14 @@
 package com.example.notemd.ui
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,6 +40,10 @@ import com.example.notemd.ui.theme.NoteMDTheme
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import com.example.notemd.token.TokenSessionManager
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 enum class NoteMDSection(val labelRes: Int) {
     Main(R.string.section_overview),
@@ -61,13 +70,16 @@ fun NoteMDApp(
     settingsUiState: SettingsUiState = SettingsUiState(),
     onDarkModeToggle: (Boolean) -> Unit = {},
     onLocationToggle: (Boolean) -> Unit = {},
+    onShakeResetToggle: (Boolean) -> Unit = {},
     tokenSessionManager: TokenSessionManager = TokenSessionManager(),
     windowSizeClass: WindowSizeClass? = null
 ) {
     var currentSection by rememberSaveable { mutableStateOf(NoteMDSection.Main) }
     var noteToEditId by rememberSaveable { mutableStateOf<Long?>(null) }
     var noteEditorSession by rememberSaveable { mutableStateOf(0) }
-    var tokenList by rememberSaveable(stateSaver = TokenListSaver) { mutableStateOf(DefaultTokenList) }
+    var tokenList by remember { mutableStateOf(DefaultTokenList) }
+    val activeTokenHash by tokenSessionManager.activeTokenHash
+        .collectAsStateWithLifecycle(initialValue = tokenSessionManager.activeTokenHash.value)
 
     val notesViewModel: NotesViewModel? = if (previewUiState == null) {
         viewModel(factory = NotesViewModel.Factory)
@@ -97,7 +109,14 @@ fun NoteMDApp(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text(topBarTitle) },
+                title = {
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(topBarTitle)
+                        activeTokenHash?.let { hash ->
+                            TokenBadge(hash = hash)
+                        }
+                    }
+                },
                 scrollBehavior = appBarScrollBehavior
             )
         },
@@ -162,7 +181,6 @@ fun NoteMDApp(
                     )
                     NoteMDSection.Tokens -> TokenPracticeScreen(
                         tokens = tokenList,
-                        onTokensUpdated = { tokenList = it },
                         onUnlockWithTokens = { tokens ->
                             tokenSessionManager.unlock(tokens)
                         }
@@ -171,7 +189,13 @@ fun NoteMDApp(
                         darkThemeEnabled = settingsUiState.darkThemeEnabled,
                         onDarkThemeChanged = onDarkModeToggle,
                         locationAllowed = settingsUiState.allowLocation,
-                        onLocationToggle = onLocationToggle
+                        onLocationToggle = onLocationToggle,
+                        shakeResetEnabled = settingsUiState.shakeResetEnabled,
+                        onShakeResetToggle = onShakeResetToggle,
+                        onResetTokens = {
+                            tokenList = DefaultTokenList
+                            tokenSessionManager.unlock(DefaultTokenList)
+                        }
                     )
                 }
             }
@@ -208,6 +232,38 @@ private fun NoteMDBottomBar(
 }
 
 @Composable
+private fun TokenBadge(hash: String) {
+    val suffix = hash.takeLast(5).uppercase()
+    val (background, content) = remember(hash) { tokenBadgeColors(hash) }
+    Surface(
+        shape = RoundedCornerShape(12.dp),
+        color = background,
+        contentColor = content,
+        tonalElevation = 0.dp
+    ) {
+        Text(
+            text = "Key $suffix",
+            style = MaterialTheme.typography.labelSmall.copy(fontSize = 12.sp),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            fontWeight = FontWeight.SemiBold
+        )
+    }
+}
+
+private fun tokenBadgeColors(hash: String): Pair<Color, Color> {
+    val slice = hash.takeLast(6)
+    val numeric = slice.toLongOrNull(16) ?: 0L
+    val hue = (numeric % 360).toFloat()
+    val bg = Color.hsv(
+        hue = hue,
+        saturation = 0.35f,
+        value = 0.92f
+    )
+    val content = if (bg.luminance() > 0.6f) Color.Black else Color.White
+    return bg to content
+}
+
+@Composable
 private fun NoteMDNavigationRail(
     currentSection: NoteMDSection,
     onSectionSelected: (NoteMDSection) -> Unit
@@ -240,17 +296,25 @@ private fun SectionIconBadge(
     isSelected: Boolean
 ) {
     // Using the first character keeps the navigation bar tidy on small screens.
+    val bg = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
+    val fg = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
     Surface(
         shape = CircleShape,
-        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-        contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+        color = bg,
+        contentColor = fg,
+        tonalElevation = if (isSelected) 4.dp else 0.dp
     ) {
-        Text(
-            modifier = Modifier,
-            text = label.first().uppercase(),
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.SemiBold
-        )
+        Box(
+            modifier = Modifier.size(36.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            val letter = label.firstOrNull()?.uppercase() ?: ""
+            Text(
+                text = letter,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
     }
 }
 

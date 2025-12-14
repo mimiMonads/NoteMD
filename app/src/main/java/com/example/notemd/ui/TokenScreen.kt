@@ -56,21 +56,22 @@ import com.example.notemd.token.TokenUtils
 @Composable
 fun TokenPracticeScreen(
     tokens: List<String> = DefaultTokenList,
-    onTokensUpdated: (List<String>) -> Unit = {},
     onUnlockWithTokens: (List<String>) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
 
     val tokenOrder = remember(tokens) { tokens.withIndex().associate { it.value to it.index } }
 
-    var trayTokens by rememberSaveable(tokens, stateSaver = TokenListSaver) { mutableStateOf(tokens) }
-    var droppedTokens by rememberSaveable(tokens, stateSaver = TokenListSaver) { mutableStateOf(emptyList<String>()) }
+    var trayTokens by rememberSaveable(stateSaver = TokenListSaver) { mutableStateOf(tokens) }
+    var droppedTokens by rememberSaveable(stateSaver = TokenListSaver) { mutableStateOf(emptyList<String>()) }
     var dropBounds by remember { mutableStateOf<Rect?>(null) }
     var trayBounds by remember { mutableStateOf<Rect?>(null) }
     var dropActive by remember { mutableStateOf(false) }
     var trayActive by remember { mutableStateOf(false) }
-    var tokenInput by rememberSaveable(tokens) { mutableStateOf(tokens.joinToString(" ")) }
-    val parsedTokens = remember(tokenInput) { TokenUtils.stringToTokens(tokenInput) }
+    androidx.compose.runtime.LaunchedEffect(tokens) {
+        trayTokens = tokens
+        droppedTokens = emptyList()
+    }
 
     // Helper to keep tokens sorted even after we stuff them back into the tray.
     fun List<String>.sortedByOriginalOrder(): List<String> =
@@ -88,18 +89,6 @@ fun TokenPracticeScreen(
             .padding(horizontal = 8.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
-        TokenBuilderCard(
-            tokenInput = tokenInput,
-            parsedTokens = parsedTokens,
-            currentCount = tokens.size,
-            onTokenInputChange = { tokenInput = it },
-            onApplyTokens = {
-                if (parsedTokens.isNotEmpty()) {
-                    onTokensUpdated(parsedTokens)
-                }
-            }
-        )
-
         Text(
             text = stringResource(id = R.string.tokens_instructions),
             style = MaterialTheme.typography.bodySmall
@@ -189,58 +178,6 @@ fun TokenPracticeScreen(
                 }
             ) {
                 Text(text = stringResource(id = R.string.tokens_reset))
-            }
-        }
-    }
-}
-
-@Composable
-private fun TokenBuilderCard(
-    tokenInput: String,
-    parsedTokens: List<String>,
-    currentCount: Int,
-    onTokenInputChange: (String) -> Unit,
-    onApplyTokens: () -> Unit
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-        shape = RoundedCornerShape(20.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(
-                text = stringResource(id = R.string.tokens_builder_title),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
-            Text(
-                text = stringResource(id = R.string.tokens_builder_description),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            OutlinedTextField(
-                value = tokenInput,
-                onValueChange = onTokenInputChange,
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(text = stringResource(id = R.string.tokens_builder_label)) },
-                placeholder = { Text(text = stringResource(id = R.string.tokens_builder_placeholder)) },
-                minLines = 2
-            )
-            Text(
-                text = stringResource(id = R.string.tokens_builder_active_count, currentCount),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Button(
-                onClick = onApplyTokens,
-                enabled = parsedTokens.isNotEmpty(),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = stringResource(id = R.string.tokens_builder_use))
             }
         }
     }

@@ -24,6 +24,9 @@
     <string name="settings_dark_mode_description">Switch between light and dark themes</string>
     <string name="settings_location_title">Allow location on notes</string>
     <string name="settings_location_description">Enable attaching your current GPS coordinates to a note</string>
+    <string name="settings_shake_reset_title">Shake to lock token</string>
+    <string name="settings_shake_reset_description">Auto-lock tokens when the device is shaken</string>
+    <string name="settings_reset_tokens">Reset tokens to default</string>
     <string name="settings_about_title">NoteMD</string>
     <string name="settings_about_body">NoteMD keeps your markdown notes tidy without any fuss.</string>
     <string name="tokens_instructions">Drag the words around.</string>
