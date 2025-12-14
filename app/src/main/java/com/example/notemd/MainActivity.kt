@@ -91,9 +91,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
     }
 }
 
-/**
- * Sanity check scaffolding changes quickly.
- */
+// Preview helper to spot UI tweaks without wiring up data flows.
 @Preview(showBackground = true)
 @Composable
 fun PreviewMainInterface() {

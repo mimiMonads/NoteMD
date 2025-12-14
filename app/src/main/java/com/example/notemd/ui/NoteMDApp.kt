@@ -334,7 +334,7 @@ private fun NoteMDAppPreview() {
     NoteMDTheme {
         NoteMDApp(
             previewUiState = NoteListUiState(
-                notes = placeholderNotes()
+                notes = sampleNotes()
             )
         )
     }

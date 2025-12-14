@@ -156,12 +156,9 @@ fun TokenPracticeScreen(
         val normalizedTokens = remember(droppedTokens) { droppedTokens.sortedNormalized() }
         val normalizedTokenString = remember(normalizedTokens) { normalizedTokens.joinToString(" ") }
         val tokenSha1 = remember(normalizedTokens) { TokenUtils.hashTokens(normalizedTokens) }
+        val hasTokens = normalizedTokens.isNotEmpty()
 
-        if (normalizedTokens.isNotEmpty()) {
-            TokenHashSummary(
-                tokensString = normalizedTokenString,
-                sha1Hash = tokenSha1
-            )
+        if (hasTokens) {
             Button(
                 onClick = { onUnlockWithTokens(normalizedTokens) },
                 modifier = Modifier.fillMaxWidth()
@@ -179,6 +176,13 @@ fun TokenPracticeScreen(
             ) {
                 Text(text = stringResource(id = R.string.tokens_reset))
             }
+        }
+
+        if (hasTokens) {
+            TokenHashSummary(
+                tokensString = normalizedTokenString,
+                sha1Hash = tokenSha1
+            )
         }
     }
 }

@@ -33,7 +33,7 @@ import com.example.notemd.ui.theme.NoteMDTheme
  */
 @Composable
 fun MainScreen(
-    notes: List<NotePreview> = placeholderNotes(),
+    notes: List<NotePreview> = sampleNotes(),
     onNoteSelected: (NotePreview) -> Unit = {}
 ) {
     LazyColumn(
@@ -70,8 +70,7 @@ fun MainScreen(
 }
 
 /**
- * Minimal representation of a note card shown on the overview screen.
- * TO be used for SQL
+ * Lightweight note details for the overview list.
  */
 data class NotePreview(
     val id: Long,
@@ -85,8 +84,7 @@ data class NotePreview(
 )
 
 /**
- * Preview
- * One-off card used inside the list; kept private since it only belongs here.
+ * Card shown inside the list; kept private since it only belongs here.
  */
 @Composable
 private fun NotePreviewCard(
@@ -143,7 +141,7 @@ private fun NotePreviewCard(
 }
 
 // Hard-coded samples so the layout still feels alive before wiring real data.
-internal fun placeholderNotes(): List<NotePreview> = listOf(
+internal fun sampleNotes(): List<NotePreview> = listOf(
      // never used
 )
 
