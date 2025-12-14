@@ -15,10 +15,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,10 +33,10 @@ import com.example.notemd.ui.theme.NoteMDTheme
 fun SettingsScreen(
     darkThemeEnabled: Boolean,
     onDarkThemeChanged: (Boolean) -> Unit,
+    locationAllowed: Boolean,
+    onLocationToggle: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var syncEnabled by rememberSaveable { mutableStateOf(true) }
-
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -56,10 +52,10 @@ fun SettingsScreen(
         )
 
         SettingsToggleRow(
-            title = stringResource(id = R.string.settings_sync),
-            subtitle = stringResource(id = R.string.settings_sync_description),
-            checked = syncEnabled,
-            onCheckedChange = { syncEnabled = it }
+            title = stringResource(id = R.string.settings_location_title),
+            subtitle = stringResource(id = R.string.settings_location_description),
+            checked = locationAllowed,
+            onCheckedChange = onLocationToggle
         )
 
         Divider()
@@ -130,7 +126,9 @@ private fun PreviewSettingsScreen() {
     NoteMDTheme {
         SettingsScreen(
             darkThemeEnabled = true,
-            onDarkThemeChanged = {}
+            onDarkThemeChanged = {},
+            locationAllowed = true,
+            onLocationToggle = {}
         )
     }
 }

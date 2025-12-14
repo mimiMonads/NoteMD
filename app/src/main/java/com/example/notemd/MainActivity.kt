@@ -34,7 +34,8 @@ class MainActivity : ComponentActivity() {
                 NoteMDApp(
                     windowSizeClass = windowSizeClass,
                     settingsUiState = settingsUiState,
-                    onDarkModeToggle = settingsViewModel::setDarkThemeEnabled
+                    onDarkModeToggle = settingsViewModel::setDarkThemeEnabled,
+                    onLocationToggle = settingsViewModel::setLocationAllowed
                 )
             }
         }

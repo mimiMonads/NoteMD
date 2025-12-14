@@ -79,7 +79,9 @@ data class NotePreview(
     val summary: String,
     val body: String,
     val tags: List<String>,
-    val lastUpdated: String
+    val lastUpdated: String,
+    val latitude: Double? = null,
+    val longitude: Double? = null
 )
 
 /**

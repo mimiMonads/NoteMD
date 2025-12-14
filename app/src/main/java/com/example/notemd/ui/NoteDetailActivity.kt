@@ -56,6 +56,8 @@ class NoteDetailActivity : ComponentActivity() {
         private const val EXTRA_NOTE_BODY = "extra_note_body"
         private const val EXTRA_NOTE_LAST_UPDATED = "extra_note_last_updated"
         private const val EXTRA_NOTE_TAGS = "extra_note_tags"
+        private const val EXTRA_NOTE_LAT = "extra_note_latitude"
+        private const val EXTRA_NOTE_LNG = "extra_note_longitude"
 
         fun createIntent(context: Context, note: NotePreview): Intent =
             Intent(context, NoteDetailActivity::class.java).apply {
@@ -65,6 +67,8 @@ class NoteDetailActivity : ComponentActivity() {
                 putExtra(EXTRA_NOTE_BODY, note.body)
                 putExtra(EXTRA_NOTE_LAST_UPDATED, note.lastUpdated)
                 putStringArrayListExtra(EXTRA_NOTE_TAGS, ArrayList(note.tags))
+                note.latitude?.let { putExtra(EXTRA_NOTE_LAT, it) }
+                note.longitude?.let { putExtra(EXTRA_NOTE_LNG, it) }
             }
 
         private fun NoteDetailArgs.Companion.fromIntent(intent: Intent?): NoteDetailArgs =
@@ -74,7 +78,9 @@ class NoteDetailActivity : ComponentActivity() {
                 summary = intent?.getStringExtra(EXTRA_NOTE_SUMMARY).orEmpty(),
                 body = intent?.getStringExtra(EXTRA_NOTE_BODY).orEmpty(),
                 lastUpdated = intent?.getStringExtra(EXTRA_NOTE_LAST_UPDATED).orEmpty(),
-                tags = intent?.getStringArrayListExtra(EXTRA_NOTE_TAGS)?.toList().orEmpty()
+                tags = intent?.getStringArrayListExtra(EXTRA_NOTE_TAGS)?.toList().orEmpty(),
+                latitude = intent?.extras?.takeIf { it.containsKey(EXTRA_NOTE_LAT) }?.getDouble(EXTRA_NOTE_LAT),
+                longitude = intent?.extras?.takeIf { it.containsKey(EXTRA_NOTE_LNG) }?.getDouble(EXTRA_NOTE_LNG)
             )
     }
 }
@@ -133,6 +139,14 @@ fun NoteDetailScreen(
                 }
             }
 
+            if (note.latitude != null && note.longitude != null) {
+                Text(
+                    text = stringResource(id = R.string.note_location_value, note.latitude, note.longitude),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
             if (note.lastUpdated.isNotBlank()) {
                 Text(
                     text = stringResource(id = R.string.main_last_updated, note.lastUpdated),
@@ -156,7 +170,9 @@ data class NoteDetailArgs(
     val summary: String = "",
     val body: String = "",
     val lastUpdated: String = "",
-    val tags: List<String> = emptyList()
+    val tags: List<String> = emptyList(),
+    val latitude: Double? = null,
+    val longitude: Double? = null
 ) {
     companion object
 }

@@ -37,6 +37,8 @@ private fun Note.toJsonString(): String {
     json.put("title", title)
     json.put("content", content)
     json.put("tags", JSONArray(tags))
+    latitude?.let { json.put("latitude", it) }
+    longitude?.let { json.put("longitude", it) }
     json.put("lastUpdated", lastUpdated)
     return json.toString()
 }

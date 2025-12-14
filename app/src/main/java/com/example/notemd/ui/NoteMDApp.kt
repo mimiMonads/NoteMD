@@ -59,6 +59,7 @@ fun NoteMDApp(
     previewUiState: NoteListUiState? = null,
     settingsUiState: SettingsUiState = SettingsUiState(),
     onDarkModeToggle: (Boolean) -> Unit = {},
+    onLocationToggle: (Boolean) -> Unit = {},
     windowSizeClass: WindowSizeClass? = null
 ) {
     var currentSection by rememberSaveable { mutableStateOf(NoteMDSection.Main) }
@@ -147,6 +148,7 @@ fun NoteMDApp(
                     NoteMDSection.Note -> NoteScreen(
                         noteId = noteToEditId,
                         editorSession = noteEditorSession,
+                        allowLocation = settingsUiState.allowLocation,
                         onSaved = {
                             noteToEditId = null
                             currentSection = NoteMDSection.Main
@@ -162,7 +164,9 @@ fun NoteMDApp(
                     )
                     NoteMDSection.Settings -> SettingsScreen(
                         darkThemeEnabled = settingsUiState.darkThemeEnabled,
-                        onDarkThemeChanged = onDarkModeToggle
+                        onDarkThemeChanged = onDarkModeToggle,
+                        locationAllowed = settingsUiState.allowLocation,
+                        onLocationToggle = onLocationToggle
                     )
                 }
             }

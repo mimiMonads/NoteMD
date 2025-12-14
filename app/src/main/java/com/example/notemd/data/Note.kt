@@ -8,5 +8,7 @@ data class Note(
     val title: String = "",
     val content: String = "",
     val tags: List<String> = emptyList(),
+    val latitude: Double? = null,
+    val longitude: Double? = null,
     val lastUpdated: Long = System.currentTimeMillis()
 )

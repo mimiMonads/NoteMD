@@ -7,21 +7,29 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.notemd.NoteMDApplication
 import com.example.notemd.data.SettingsRepository
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 data class SettingsUiState(
-    val darkThemeEnabled: Boolean = false
+    val darkThemeEnabled: Boolean = false,
+    val allowLocation: Boolean = false
 )
 
 class SettingsViewModel(
     private val repository: SettingsRepository
 ) : ViewModel() {
 
-    val uiState = repository.darkThemeEnabled
-        .map { enabled -> SettingsUiState(darkThemeEnabled = enabled) }
+    val uiState = combine(
+        repository.darkThemeEnabled,
+        repository.locationAllowed
+    ) { darkMode, allowLocation ->
+        SettingsUiState(
+            darkThemeEnabled = darkMode,
+            allowLocation = allowLocation
+        )
+    }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
@@ -31,6 +39,12 @@ class SettingsViewModel(
     fun setDarkThemeEnabled(enabled: Boolean) {
         viewModelScope.launch {
             repository.setDarkTheme(enabled)
+        }
+    }
+
+    fun setLocationAllowed(allowed: Boolean) {
+        viewModelScope.launch {
+            repository.setLocationAllowed(allowed)
         }
     }
 

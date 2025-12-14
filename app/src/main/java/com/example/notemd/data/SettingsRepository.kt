@@ -16,6 +16,7 @@ class SettingsRepository(
 
     private object Keys {
         val DarkMode = booleanPreferencesKey("dark_mode_enabled")
+        val LocationAllowed = booleanPreferencesKey("location_allowed")
     }
 
     private val systemDarkThemeEnabled: Boolean
@@ -27,9 +28,18 @@ class SettingsRepository(
     val darkThemeEnabled: Flow<Boolean> = context.settingsDataStore.data
         .map { preferences -> preferences[Keys.DarkMode] ?: systemDarkThemeEnabled }
 
+    val locationAllowed: Flow<Boolean> = context.settingsDataStore.data
+        .map { preferences -> preferences[Keys.LocationAllowed] ?: false }
+
     suspend fun setDarkTheme(enabled: Boolean) {
         context.settingsDataStore.edit { preferences ->
             preferences[Keys.DarkMode] = enabled
+        }
+    }
+
+    suspend fun setLocationAllowed(allowed: Boolean) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[Keys.LocationAllowed] = allowed
         }
     }
 }
