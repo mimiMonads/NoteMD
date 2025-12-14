@@ -144,51 +144,7 @@ private fun NotePreviewCard(
 
 // Hard-coded samples so the layout still feels alive before wiring real data.
 internal fun placeholderNotes(): List<NotePreview> = listOf(
-    NotePreview(
-        id = 1L,
-        title = "Weekly planning doc",
-        summary = "Capture weekly priorities, tasks, and quick victories to share during stand-up.",
-        body = """
-            # Weekly planning doc
-            
-            Capture weekly priorities, tasks, and quick victories to share during stand-up. Break work into small milestones and keep wins at the top for visibility.
-            
-            ## Priorities
-            - Refine editor toolbar
-            - Publish new onboarding guide
-            - Prep demo assets
-        """.trimIndent(),
-        tags = listOf("planning", "work"),
-        lastUpdated = "2h ago"
-    ),
-    NotePreview(
-        id = 2L,
-        title = "Product ideas - autumn release",
-        summary = "Brainstormed ideas pulled from customer feedback sessions and roadmap workshops.",
-        body = """
-            A brainstorm capturing customer requests and north-star ideas for the autumn release. Focus on collaborative features and mobile polish.
-            
-            * Shared notebooks with permissions
-            * Better offline sync
-            * Quick capture widgets
-        """.trimIndent(),
-        tags = listOf("ideas", "product"),
-        lastUpdated = "yesterday"
-    ),
-    NotePreview(
-        id = 3L,
-        title = "Book highlights: Deep Work",
-        summary = "Collected quotes and reflections focused on building intentional focus time habits.",
-        body = """
-            Highlights from Deep Work by Cal Newport with personal reflections on focus, attention, and routine.
-            
-            > Clarity about what matters provides clarity about what does not.
-            
-            Remember to schedule focus blocks and defend them aggressively.
-        """.trimIndent(),
-        tags = listOf("reading", "personal"),
-        lastUpdated = "Jun 12"
-    )
+     // never used
 )
 
 @Preview(showBackground = true)

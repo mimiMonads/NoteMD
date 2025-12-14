@@ -112,7 +112,9 @@ fun NoteMDApp(
                 title = {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(topBarTitle)
-                        activeTokenHash?.let { hash ->
+                        val tokenHashForBadge = activeTokenHash
+                            ?: tokenSessionManager.getActiveOrDefault()
+                        tokenHashForBadge.takeIf { it.isNotEmpty() }?.let { hash ->
                             TokenBadge(hash = hash)
                         }
                     }
@@ -169,7 +171,8 @@ fun NoteMDApp(
                     NoteMDSection.Note -> NoteScreen(
                         noteId = noteToEditId,
                         editorSession = noteEditorSession,
-                        allowLocation = settingsUiState.allowLocation,
+                        // Location feature temporarily disabled.
+                        allowLocation = false,
                         onSaved = {
                             noteToEditId = null
                             currentSection = NoteMDSection.Main
@@ -188,10 +191,17 @@ fun NoteMDApp(
                     NoteMDSection.Settings -> SettingsScreen(
                         darkThemeEnabled = settingsUiState.darkThemeEnabled,
                         onDarkThemeChanged = onDarkModeToggle,
-                        locationAllowed = settingsUiState.allowLocation,
-                        onLocationToggle = onLocationToggle,
+                        // Location feature temporarily disabled.
+                        locationAllowed = false,
+                        onLocationToggle = {},
+                        locationToggleEnabled = false,
                         shakeResetEnabled = settingsUiState.shakeResetEnabled,
                         onShakeResetToggle = onShakeResetToggle,
+                        onSimulateShake = {
+                            if (settingsUiState.shakeResetEnabled) {
+                                tokenSessionManager.clear()
+                            }
+                        },
                         onResetTokens = {
                             tokenList = DefaultTokenList
                             tokenSessionManager.unlock(DefaultTokenList)

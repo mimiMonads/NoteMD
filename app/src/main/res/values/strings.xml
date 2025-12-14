@@ -26,6 +26,8 @@
     <string name="settings_location_description">Enable attaching your current GPS coordinates to a note</string>
     <string name="settings_shake_reset_title">Shake to lock token</string>
     <string name="settings_shake_reset_description">Auto-lock tokens when the device is shaken</string>
+    <string name="settings_debug_simulate_shake">Simulate shake (debug)</string>
+    <string name="settings_debug_simulate_shake_description">Trigger the shake reset to clear the active token and fall back to the default key.</string>
     <string name="settings_reset_tokens">Reset tokens to default</string>
     <string name="settings_about_title">NoteMD</string>
     <string name="settings_about_body">NoteMD keeps your markdown notes tidy without any fuss.</string>

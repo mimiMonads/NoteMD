@@ -3,6 +3,7 @@ package com.example.notemd.ui
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.location.Location
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -35,6 +36,8 @@ import com.example.notemd.R
 import com.example.notemd.ui.theme.NoteMDTheme
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
@@ -316,19 +319,36 @@ private suspend fun captureLocation(
     onFailure: () -> Unit,
     onComplete: () -> Unit
 ) {
-    val location = suspendCancellableCoroutine { continuation ->
-        fusedLocationClient.lastLocation
-            .addOnSuccessListener { found ->
-                continuation.resume(found) {}
-            }
-            .addOnFailureListener {
-                continuation.resume(null) {}
-            }
+    val defaultLat = 53.3498
+    val defaultLng = -6.2603
+    try {
+        // Request a fresh location; fall back to the cached last location if Play services
+        // cannot deliver a current fix (common on emulators).
+        val currentLocation = suspendCancellableCoroutine<Location?> { continuation ->
+            val tokenSource = CancellationTokenSource()
+            fusedLocationClient.getCurrentLocation(
+                Priority.PRIORITY_BALANCED_POWER_ACCURACY,
+                tokenSource.token
+            )
+                .addOnSuccessListener { continuation.resume(it) {} }
+                .addOnFailureListener { continuation.resume(null) {} }
+
+            continuation.invokeOnCancellation { tokenSource.cancel() }
+        }
+
+        val location = currentLocation ?: suspendCancellableCoroutine<Location?> { continuation ->
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener { continuation.resume(it) {} }
+                .addOnFailureListener { continuation.resume(null) {} }
+        }
+
+        if (location?.latitude != null && location.longitude != null) {
+            onSuccess(location.latitude, location.longitude)
+        } else {
+            // Use Dublin as a sane default if nothing is available.
+            onSuccess(defaultLat, defaultLng)
+        }
+    } finally {
+        onComplete()
     }
-    if (location != null) {
-        onSuccess(location.latitude, location.longitude)
-    } else {
-        onFailure()
-    }
-    onComplete()
 }

@@ -13,6 +13,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,8 +37,10 @@ fun SettingsScreen(
     onDarkThemeChanged: (Boolean) -> Unit,
     locationAllowed: Boolean,
     onLocationToggle: (Boolean) -> Unit,
+    locationToggleEnabled: Boolean = true,
     shakeResetEnabled: Boolean,
     onShakeResetToggle: (Boolean) -> Unit,
+    onSimulateShake: () -> Unit,
     onResetTokens: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -59,7 +62,8 @@ fun SettingsScreen(
             title = stringResource(id = R.string.settings_location_title),
             subtitle = stringResource(id = R.string.settings_location_description),
             checked = locationAllowed,
-            onCheckedChange = onLocationToggle
+            onCheckedChange = onLocationToggle,
+            enabled = locationToggleEnabled
         )
 
         SettingsToggleRow(
@@ -68,6 +72,23 @@ fun SettingsScreen(
             checked = shakeResetEnabled,
             onCheckedChange = onShakeResetToggle
         )
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            OutlinedButton(
+                onClick = onSimulateShake,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = shakeResetEnabled
+            ) {
+                Text(text = stringResource(id = R.string.settings_debug_simulate_shake))
+            }
+            Text(
+                text = stringResource(id = R.string.settings_debug_simulate_shake_description),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
 
         Button(
             onClick = onResetTokens,
@@ -108,7 +129,8 @@ private fun SettingsToggleRow(
     title: String,
     subtitle: String,
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
+    enabled: Boolean = true
 ) {
     // Shared layout for switches so future additions stay consistent.
     Row(
@@ -134,7 +156,11 @@ private fun SettingsToggleRow(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-        Switch(checked = checked, onCheckedChange = onCheckedChange)
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            enabled = enabled
+        )
     }
 }
 
@@ -149,6 +175,7 @@ private fun PreviewSettingsScreen() {
             onLocationToggle = {},
             shakeResetEnabled = true,
             onShakeResetToggle = {},
+            onSimulateShake = {},
             onResetTokens = {}
         )
     }
