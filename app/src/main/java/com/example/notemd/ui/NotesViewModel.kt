@@ -79,8 +79,6 @@ private fun Note.toPreview(): NotePreview {
         summary = summaryText,
         body = content,
         tags = tags,
-        lastUpdated = lastUpdatedText,
-        latitude = latitude,
-        longitude = longitude
+        lastUpdated = lastUpdatedText
     )
 }

@@ -69,7 +69,6 @@ fun NoteMDApp(
     previewUiState: NoteListUiState? = null,
     settingsUiState: SettingsUiState = SettingsUiState(),
     onDarkModeToggle: (Boolean) -> Unit = {},
-    onLocationToggle: (Boolean) -> Unit = {},
     onShakeResetToggle: (Boolean) -> Unit = {},
     tokenSessionManager: TokenSessionManager = TokenSessionManager(),
     windowSizeClass: WindowSizeClass? = null
@@ -171,8 +170,6 @@ fun NoteMDApp(
                     NoteMDSection.Note -> NoteScreen(
                         noteId = noteToEditId,
                         editorSession = noteEditorSession,
-                        // Location feature temporarily disabled.
-                        allowLocation = false,
                         onSaved = {
                             noteToEditId = null
                             currentSection = NoteMDSection.Main
@@ -191,10 +188,6 @@ fun NoteMDApp(
                     NoteMDSection.Settings -> SettingsScreen(
                         darkThemeEnabled = settingsUiState.darkThemeEnabled,
                         onDarkThemeChanged = onDarkModeToggle,
-                        // Location feature temporarily disabled.
-                        locationAllowed = false,
-                        onLocationToggle = {},
-                        locationToggleEnabled = false,
                         shakeResetEnabled = settingsUiState.shakeResetEnabled,
                         onShakeResetToggle = onShakeResetToggle,
                         onSimulateShake = {

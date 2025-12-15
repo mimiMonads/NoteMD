@@ -53,7 +53,6 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                     windowSizeClass = windowSizeClass,
                     settingsUiState = settingsUiState,
                     onDarkModeToggle = settingsViewModel::setDarkThemeEnabled,
-                    onLocationToggle = settingsViewModel::setLocationAllowed,
                     onShakeResetToggle = settingsViewModel::setShakeResetEnabled,
                     tokenSessionManager = tokenSessionManager
                 )

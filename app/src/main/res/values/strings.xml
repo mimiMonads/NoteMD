@@ -22,8 +22,6 @@
     <string name="note_empty_state">You haven’t saved any notes yet. Start with a title or some content.</string>
     <string name="settings_dark_mode">Dark mode</string>
     <string name="settings_dark_mode_description">Switch between light and dark themes</string>
-    <string name="settings_location_title">Allow location on notes</string>
-    <string name="settings_location_description">Enable attaching your current GPS coordinates to a note</string>
     <string name="settings_shake_reset_title">Shake to lock token</string>
     <string name="settings_shake_reset_description">Auto-lock tokens when the device is shaken</string>
     <string name="settings_debug_simulate_shake">Simulate shake (debug)</string>
@@ -49,10 +47,4 @@
     <string name="tokens_hash_value">SHA-1: %1$s</string>
     <string name="note_detail_title_fallback">Note details</string>
     <string name="note_detail_navigate_home">Go back</string>
-    <string name="note_location_add">Add current location</string>
-    <string name="note_location_remove">Remove location</string>
-    <string name="note_location_value">Lat: %1$.4f, Lng: %2$.4f</string>
-    <string name="note_location_fetching">Finding your location…</string>
-    <string name="note_location_permission_needed">Location permission is required to attach your position.</string>
-    <string name="note_location_unavailable">Unable to find your location right now.</string>
 </resources>

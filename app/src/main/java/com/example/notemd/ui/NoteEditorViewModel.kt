@@ -21,14 +21,11 @@ data class NoteEditorUiState(
     val title: String = "",
     val content: String = "",
     val tagsInput: String = "",
-    val latitude: Double? = null,
-    val longitude: Double? = null,
     val isSaving: Boolean = false,
     val isDeleting: Boolean = false
 ) {
     val isEditing: Boolean get() = noteId != null
     val canSave: Boolean get() = title.isNotBlank() || content.isNotBlank()
-    val hasLocation: Boolean get() = latitude != null && longitude != null
 }
 
 class NoteEditorViewModel(
@@ -52,9 +49,7 @@ class NoteEditorViewModel(
                             noteId = note.id,
                             title = note.title,
                             content = note.content,
-                            tagsInput = note.tags.joinToString(", "),
-                            latitude = note.latitude,
-                            longitude = note.longitude
+                            tagsInput = note.tags.joinToString(", ")
                         )
                     }
                 }
@@ -86,8 +81,6 @@ class NoteEditorViewModel(
                 title = current.title.trim(),
                 content = current.content.trim(),
                 tags = current.tagsInput.toTagList().distinct(),
-                latitude = current.latitude,
-                longitude = current.longitude,
                 tokenHash = tokenHash
             )
             val newId = repository.upsertNote(note, tokenHash)
@@ -113,14 +106,6 @@ class NoteEditorViewModel(
             _uiState.value = NoteEditorUiState()
             onDeleted()
         }
-    }
-
-    fun setLocation(latitude: Double, longitude: Double) {
-        _uiState.update { it.copy(latitude = latitude, longitude = longitude) }
-    }
-
-    fun clearLocation() {
-        _uiState.update { it.copy(latitude = null, longitude = null) }
     }
 
     companion object {

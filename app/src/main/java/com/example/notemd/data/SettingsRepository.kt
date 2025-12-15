@@ -16,7 +16,6 @@ class SettingsRepository(
 
     private object Keys {
         val DarkMode = booleanPreferencesKey("dark_mode_enabled")
-        val LocationAllowed = booleanPreferencesKey("location_allowed")
         val ShakeResetEnabled = booleanPreferencesKey("shake_reset_enabled")
     }
 
@@ -29,21 +28,12 @@ class SettingsRepository(
     val darkThemeEnabled: Flow<Boolean> = context.settingsDataStore.data
         .map { preferences -> preferences[Keys.DarkMode] ?: systemDarkThemeEnabled }
 
-    val locationAllowed: Flow<Boolean> = context.settingsDataStore.data
-        .map { preferences -> preferences[Keys.LocationAllowed] ?: false }
-
     val shakeResetEnabled: Flow<Boolean> = context.settingsDataStore.data
         .map { preferences -> preferences[Keys.ShakeResetEnabled] ?: true }
 
     suspend fun setDarkTheme(enabled: Boolean) {
         context.settingsDataStore.edit { preferences ->
             preferences[Keys.DarkMode] = enabled
-        }
-    }
-
-    suspend fun setLocationAllowed(allowed: Boolean) {
-        context.settingsDataStore.edit { preferences ->
-            preferences[Keys.LocationAllowed] = allowed
         }
     }
 

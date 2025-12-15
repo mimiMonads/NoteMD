@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 
 data class SettingsUiState(
     val darkThemeEnabled: Boolean = false,
-    val allowLocation: Boolean = false,
     val shakeResetEnabled: Boolean = true
 )
 
@@ -24,12 +23,10 @@ class SettingsViewModel(
 
     val uiState = combine(
         repository.darkThemeEnabled,
-        repository.locationAllowed,
         repository.shakeResetEnabled
-    ) { darkMode, allowLocation, shakeResetEnabled ->
+    ) { darkMode, shakeResetEnabled ->
         SettingsUiState(
             darkThemeEnabled = darkMode,
-            allowLocation = allowLocation,
             shakeResetEnabled = shakeResetEnabled
         )
     }
@@ -42,12 +39,6 @@ class SettingsViewModel(
     fun setDarkThemeEnabled(enabled: Boolean) {
         viewModelScope.launch {
             repository.setDarkTheme(enabled)
-        }
-    }
-
-    fun setLocationAllowed(allowed: Boolean) {
-        viewModelScope.launch {
-            repository.setLocationAllowed(allowed)
         }
     }
 

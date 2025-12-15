@@ -58,7 +58,6 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.datastore.preferences)
-    implementation(libs.google.play.services.location)
     kapt(libs.androidx.room.compiler)
     testImplementation(libs.junit)
     testImplementation("org.json:json:20231013")

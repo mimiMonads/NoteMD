@@ -35,9 +35,6 @@ import com.example.notemd.ui.theme.NoteMDTheme
 fun SettingsScreen(
     darkThemeEnabled: Boolean,
     onDarkThemeChanged: (Boolean) -> Unit,
-    locationAllowed: Boolean,
-    onLocationToggle: (Boolean) -> Unit,
-    locationToggleEnabled: Boolean = true,
     shakeResetEnabled: Boolean,
     onShakeResetToggle: (Boolean) -> Unit,
     onSimulateShake: () -> Unit,
@@ -56,14 +53,6 @@ fun SettingsScreen(
             subtitle = stringResource(id = R.string.settings_dark_mode_description),
             checked = darkThemeEnabled,
             onCheckedChange = onDarkThemeChanged
-        )
-
-        SettingsToggleRow(
-            title = stringResource(id = R.string.settings_location_title),
-            subtitle = stringResource(id = R.string.settings_location_description),
-            checked = locationAllowed,
-            onCheckedChange = onLocationToggle,
-            enabled = locationToggleEnabled
         )
 
         SettingsToggleRow(
@@ -171,8 +160,6 @@ private fun PreviewSettingsScreen() {
         SettingsScreen(
             darkThemeEnabled = true,
             onDarkThemeChanged = {},
-            locationAllowed = true,
-            onLocationToggle = {},
             shakeResetEnabled = true,
             onShakeResetToggle = {},
             onSimulateShake = {},

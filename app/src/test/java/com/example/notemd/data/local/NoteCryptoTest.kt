@@ -22,8 +22,6 @@ class NoteCryptoTest {
             title = "Secret title",
             content = "Top secret content",
             tags = listOf("tag1", "tag2"),
-            latitude = 10.5,
-            longitude = -20.25,
             tokenHash = tokenHash,
             lastUpdated = 1234L
         )

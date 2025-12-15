@@ -21,8 +21,6 @@ object NoteCrypto {
         json.put("title", note.title)
         json.put("content", note.content)
         json.put("tags", JSONArray(note.tags))
-        note.latitude?.let { json.put("latitude", it) }
-        note.longitude?.let { json.put("longitude", it) }
         json.put("lastUpdated", note.lastUpdated)
         val plain = json.toString()
         val key = secretKey(note.tokenHash)
@@ -52,8 +50,6 @@ object NoteCrypto {
                 title = json.optString("title"),
                 content = json.optString("content"),
                 tags = json.optJSONArray("tags")?.toStringList().orEmpty(),
-                latitude = json.optDoubleOrNull("latitude"),
-                longitude = json.optDoubleOrNull("longitude"),
                 tokenHash = tokenHash,
                 lastUpdated = json.optLong("lastUpdated")
             )
@@ -75,9 +71,6 @@ object NoteCrypto {
         return SecretKeySpec(keyBytes, "AES")
     }
 }
-
-private fun JSONObject.optDoubleOrNull(name: String): Double? =
-    if (has(name)) optDouble(name) else null
 
 private fun JSONArray.toStringList(): List<String> =
     (0 until length()).mapNotNull { idx -> optString(idx) }

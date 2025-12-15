@@ -8,8 +8,6 @@ data class Note(
     val title: String = "",
     val content: String = "",
     val tags: List<String> = emptyList(),
-    val latitude: Double? = null,
-    val longitude: Double? = null,
     val tokenHash: String = com.example.notemd.token.TokenUtils.defaultTokenHash,
     val lastUpdated: Long = System.currentTimeMillis()
 )
